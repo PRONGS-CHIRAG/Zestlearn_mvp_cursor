@@ -1,23 +1,174 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
+import { extractText } from "@/lib/documents/extractText";
+import { summarizeDocument } from "@/lib/documents/summarizeDocument";
+import { isSupportedExtension } from "@/lib/documents/supportedTypes";
+import { GeminiProvider } from "@/lib/ai/providers/gemini";
+import { toReadableError } from "@/lib/utils/errors";
+
+// File size limit: 10 MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+function getConvexClient(): ConvexHttpClient {
+  const url = process.env.NEXT_PUBLIC_CONVEX_URL;
+  if (!url) throw new Error("NEXT_PUBLIC_CONVEX_URL is not set");
+  return new ConvexHttpClient(url);
+}
 
 export async function POST(req: NextRequest) {
+  let documentId: Id<"documents"> | null = null;
+  const convex = getConvexClient();
+
   try {
-    // TODO: implement document upload and processing pipeline
-    // 1. Parse multipart form data (workspaceId + file)
-    // 2. Validate file type and workspaceId
-    // 3. Create document record in Convex
-    // 4. Extract text from file
-    // 5. Summarize text via LLM
-    // 6. Generate tags
-    // 7. Save results and update processing status
-    return NextResponse.json(
-      { success: false, error: "Not implemented" },
-      { status: 501 }
-    );
+    // ── 1. Parse multipart form data ─────────────────────────────────────
+    const formData = await req.formData();
+    const workspaceId = formData.get("workspaceId");
+    const file = formData.get("file");
+
+    if (!workspaceId || typeof workspaceId !== "string") {
+      return NextResponse.json(
+        { success: false, error: "workspaceId is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!file || !(file instanceof File)) {
+      return NextResponse.json(
+        { success: false, error: "file is required" },
+        { status: 400 }
+      );
+    }
+
+    // ── 2. Validate file ─────────────────────────────────────────────────
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { success: false, error: "File exceeds 10 MB limit" },
+        { status: 413 }
+      );
+    }
+
+    // Browsers sometimes send "text/plain" for .md files — normalise to the
+    // canonical MIME type so downstream extractors handle it correctly.
+    const rawMime = file.type || "application/octet-stream";
+    const lower = file.name.toLowerCase();
+    const mimeType =
+      rawMime === "text/plain" && lower.endsWith(".md") ? "text/markdown" : rawMime;
+
+    if (!isSupportedExtension(file.name)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Unsupported file type. Accepted: .txt, .md, .pdf`,
+        },
+        { status: 415 }
+      );
+    }
+
+    // ── 3. Create document record (status: "uploaded") ───────────────────
+    documentId = await convex.mutation(api.documents.createDocumentRecord, {
+      workspaceId: workspaceId as Id<"workspaces">,
+      fileName: file.name,
+      fileType: mimeType,
+      // MVP: no binary file storage — text is extracted in-memory
+      storagePath: undefined,
+    });
+
+    // ── 4. Mark as processing ─────────────────────────────────────────────
+    await convex.mutation(api.documents.updateDocumentProcessingStatus, {
+      documentId,
+      processingStatus: "processing",
+    });
+
+    // ── 5. Extract text ───────────────────────────────────────────────────
+    const arrayBuffer = await file.arrayBuffer();
+    const fileBuffer = Buffer.from(arrayBuffer);
+    const extraction = await extractText(fileBuffer, file.name, mimeType);
+
+    if (extraction.error && !extraction.text) {
+      // Hard failure: no text at all and not a soft partial failure
+      if (!extraction.partial) {
+        await convex.mutation(api.documents.updateDocumentProcessingStatus, {
+          documentId,
+          processingStatus: "error",
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            error: extraction.error,
+            documentId,
+          },
+          { status: 422 }
+        );
+      }
+      // Partial (e.g. scanned PDF) — document is saved but no summary
+    }
+
+    // ── 6. Summarize + tag via Gemini ─────────────────────────────────────
+    let summary = "Document uploaded. AI summary not available.";
+    let tags: string[] = [];
+    let keyFacts: string[] = [];
+
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (geminiKey && extraction.text.trim()) {
+      try {
+        const provider = new GeminiProvider(geminiKey);
+        const result = await summarizeDocument(extraction.text, provider);
+        summary = result.summary;
+        tags = result.tags;
+        keyFacts = result.keyFacts;
+
+        // Embed keyFacts into the stored summary so the report builder can
+        // read them from the single `summary` field without schema changes.
+        if (keyFacts.length > 0) {
+          summary =
+            result.summary +
+            "\n\nKey Facts:\n" +
+            keyFacts.map((f) => `- ${f}`).join("\n");
+        }
+      } catch (aiError) {
+        // Non-fatal: proceed without summary rather than failing the upload
+        console.error("[upload] AI processing failed:", aiError);
+        summary = "Document uploaded. AI summarization failed — will retry on next access.";
+      }
+    }
+
+    // ── 7. Save results (status: "done") ──────────────────────────────────
+    await convex.mutation(api.documents.saveDocumentSummary, {
+      documentId,
+      extractedText: extraction.text || undefined,
+      summary,
+      tags,
+    });
+
+    return NextResponse.json({
+      success: true,
+      documentId,
+      fileName: file.name,
+      summary: keyFacts.length > 0
+        ? summary.split("\n\nKey Facts:")[0]  // return clean summary in response
+        : summary,
+      keyFacts,
+      tags,
+    });
   } catch (error) {
-    console.error("[upload] error:", error);
+    console.error("[upload] unhandled error:", error);
+
+    // Best-effort: mark document as errored if one was already created
+    if (documentId) {
+      try {
+        await convex.mutation(api.documents.updateDocumentProcessingStatus, {
+          documentId,
+          processingStatus: "error",
+        });
+      } catch {
+        // ignore secondary failure
+      }
+    }
+
     return NextResponse.json(
-      { success: false, error: "Upload failed" },
+      { success: false, error: toReadableError(error) },
       { status: 500 }
     );
   }
