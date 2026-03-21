@@ -100,8 +100,17 @@ export default function WorkspaceShell({ workspaceId, initialData }: Props) {
       {/* Header */}
       <header className="relative z-20 border-b border-white/[0.06] bg-background/70 backdrop-blur-2xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Logo and breadcrumb */}
+          {/* Back button and Logo */}
           <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/"
+              className="flex items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] p-2 text-muted-foreground transition-all hover:border-white/15 hover:bg-white/[0.05] hover:text-foreground"
+              title="Back to Home"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+            </Link>
             <Link href="/" className="group flex items-center gap-2.5 transition-opacity hover:opacity-80">
               <div className="relative">
                 <Image
