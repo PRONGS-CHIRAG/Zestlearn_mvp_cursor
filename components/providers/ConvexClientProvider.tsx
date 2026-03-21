@@ -3,16 +3,18 @@
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { ReactNode } from "react";
 
-// Initialize once at module level (not inside component) as Convex recommends.
-// Guard against missing URL so the app renders without Convex during local dev
-// before `npx convex dev` has been run.
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-const convex = convexUrl ? new ConvexReactClient(convexUrl) : null;
+
+if (!convexUrl) {
+  throw new Error(
+    "[ZestLearn] NEXT_PUBLIC_CONVEX_URL is not set.\n" +
+    "Run `npx convex dev` first, then restart the Next.js dev server."
+  );
+}
+
+// Initialize once at module level — safe to do because the URL is guaranteed above.
+const convex = new ConvexReactClient(convexUrl);
 
 export default function ConvexClientProvider({ children }: { children: ReactNode }) {
-  if (!convex) {
-    // Convex not yet initialized — render children so the UI works standalone
-    return <>{children}</>;
-  }
   return <ConvexProvider client={convex}>{children}</ConvexProvider>;
 }

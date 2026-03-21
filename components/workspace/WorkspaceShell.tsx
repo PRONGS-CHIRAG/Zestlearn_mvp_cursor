@@ -6,6 +6,7 @@ import DocumentsPanel from "./DocumentsPanel";
 import ChatPanel from "./ChatPanel";
 import ReportsPanel from "./ReportsPanel";
 import InsightsPanel from "./InsightsPanel";
+import PanelErrorBoundary from "@/components/shared/PanelErrorBoundary";
 
 const TABS = ["Overview", "Documents", "Chat", "Reports", "Insights"] as const;
 type Tab = (typeof TABS)[number];
@@ -44,11 +45,13 @@ export default function WorkspaceShell({ workspaceId }: Props) {
 
       {/* Panel content */}
       <main className="flex-1 px-6 py-8">
-        {activeTab === "Overview" && <OverviewPanel workspaceId={workspaceId} />}
-        {activeTab === "Documents" && <DocumentsPanel workspaceId={workspaceId} />}
-        {activeTab === "Chat" && <ChatPanel workspaceId={workspaceId} />}
-        {activeTab === "Reports" && <ReportsPanel workspaceId={workspaceId} />}
-        {activeTab === "Insights" && <InsightsPanel workspaceId={workspaceId} />}
+        <PanelErrorBoundary>
+          {activeTab === "Overview" && <OverviewPanel workspaceId={workspaceId} />}
+          {activeTab === "Documents" && <DocumentsPanel workspaceId={workspaceId} />}
+          {activeTab === "Chat" && <ChatPanel workspaceId={workspaceId} />}
+          {activeTab === "Reports" && <ReportsPanel workspaceId={workspaceId} />}
+          {activeTab === "Insights" && <InsightsPanel workspaceId={workspaceId} />}
+        </PanelErrorBoundary>
       </main>
     </div>
   );

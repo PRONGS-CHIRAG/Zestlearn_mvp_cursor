@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import type {
   AssessmentInput,
   AssessmentValidationErrors,
-  AssessmentSubmitResponse,
 } from "@/types/assessment";
 import CompanyDetailsStep from "./CompanyDetailsStep";
 import BottleneckStep from "./BottleneckStep";
@@ -24,27 +25,15 @@ const initialState: AssessmentInput = {
   dataAvailability: "",
 };
 
-// Mock submit function - replace with actual API call
-async function submitAssessment(
-  data: AssessmentInput
-): Promise<AssessmentSubmitResponse> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-
-  // Mock success response with workspace ID
-  return {
-    success: true,
-    workspaceId: `ws_${Date.now()}`,
-    assessmentId: `asmt_${Date.now()}`,
-  };
-}
-
 interface Props {
-  onSubmit?: (data: AssessmentInput) => Promise<AssessmentSubmitResponse>;
+  // kept for testing/storybook overrides — production uses Convex directly
+  onSubmit?: (data: AssessmentInput) => Promise<{ success: boolean; workspaceId?: string; error?: string }>;
 }
 
 export default function AssessmentForm({ onSubmit }: Props) {
   const router = useRouter();
+  const createWorkspace = useMutation(api.workspaces.createWorkspace);
+  const submitAssessmentMutation = useMutation(api.assessments.submitAssessment);
   const [form, setForm] = useState<AssessmentInput>(initialState);
   const [errors, setErrors] = useState<AssessmentValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -193,20 +182,50 @@ export default function AssessmentForm({ onSubmit }: Props) {
     setServerError(null);
 
     try {
-      const submitFn = onSubmit || submitAssessment;
-      const result = await submitFn(form);
-
-      if (result.success && result.workspaceId) {
-        router.push(`/workspace/${result.workspaceId}`);
-      } else {
-        setServerError(result.error || "Submission failed. Please try again.");
+      if (onSubmit) {
+        // allow override for testing/storybook
+        const result = await onSubmit(form);
+        if (result.success && result.workspaceId) {
+          router.push(`/workspace/${result.workspaceId}`);
+        } else {
+          setServerError(result.error || "Submission failed. Please try again.");
+        }
+        return;
       }
+
+      // Step 1: create workspace record with company profile
+      const result = await createWorkspace({
+        companyName: form.companyName,
+        companyType: form.companyType,
+        companySize: form.companySize,
+        department: form.department,
+        role: form.role,
+        aiMaturity: form.aiMaturity,
+      });
+
+      const workspaceId = result?.workspaceId;
+      if (!workspaceId) {
+        throw new Error("Workspace creation returned no ID — check Convex logs.");
+      }
+
+      // Step 2: save assessment data linked to the workspace
+      await submitAssessmentMutation({
+        workspaceId,
+        bottleneck: form.bottleneck,
+        desiredOutcome: form.desiredOutcome,
+        currentTools: form.currentTools || undefined,
+        dataAvailability: form.dataAvailability || undefined,
+      });
+
+      // Step 3: navigate to the live workspace
+      router.push(`/workspace/${workspaceId}`);
     } catch (err) {
-      setServerError(
+      const message =
         err instanceof Error
           ? err.message
-          : "An unexpected error occurred. Please try again."
-      );
+          : "An unexpected error occurred. Please try again.";
+      console.error("[ZestLearn] Assessment submit error:", message, err);
+      setServerError(message);
     } finally {
       setLoading(false);
     }
