@@ -11,7 +11,7 @@ If multiple tasks are listed, Cursor should complete them in order and stop afte
 
 ## Active Task
 
-**Wire the assessment-to-workspace flow end-to-end using Convex**
+**Wire the assessment-to-workspace flow end-to-end using Convex (Phase 2)**
 
 ---
 

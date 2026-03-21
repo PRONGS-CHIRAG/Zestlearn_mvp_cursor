@@ -133,17 +133,22 @@ The full shared base scaffold has been created and `npm install` has been run su
 
 ### What Works
 - Project folder structure matches the architecture doc exactly
-- TypeScript compiles with zero errors
+- TypeScript compiles with zero errors (all routes, all components, all lib files)
 - All shared type contracts are defined
-- All Convex table schemas are defined
-- Route skeleton exists and will resolve correctly once Next.js runs
-- Shared base is ready for milestone-by-milestone implementation
+- All Convex table schemas defined and **deployed live** (nautical-narwhal-66.eu-west-1.convex.cloud)
+- Convex `_generated/` exists (api.d.ts, dataModel.d.ts, server.d.ts all generated)
+- All three primary routes return HTTP 200: `/`, `/assessment`, `/workspace/[workspaceId]`
+- Landing page renders all 5 sections: Hero, HowItWorks, ExampleOutputs, TargetAudience, CTASection
+- Assessment page renders form with full validation UI
+- Workspace shell renders with tab navigation
+- Inter font loaded via next/font/google, ConvexClientProvider connected
+- **Phase 1 complete**: app boots, all routes resolve, TypeScript passes, Convex live
 
 ### Known Issues
-- Convex `_generated/` will not exist until `npx convex dev` is run — this is expected
-- All API routes return 501 Not Implemented — they are stubs awaiting implementation
-- Hooks return null/empty — await Convex `_generated/api` to wire them
-- AssessmentForm submit calls `console.log` — needs real mutation wired in Milestone 1
+- All API routes return 501 Not Implemented — stubs awaiting Phase 4–6 implementation
+- Hooks return null/empty — Convex `_generated/api` exists but hooks not yet wired
+- AssessmentForm submit calls `console.log` — real Convex mutation wiring is Phase 2 scope
+- Watchpack EMFILE warnings in dev (macOS file descriptor limit) — cosmetic, does not affect functionality
 
 ---
 
