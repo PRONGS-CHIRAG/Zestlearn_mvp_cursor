@@ -6,21 +6,9 @@ const examples = [
       "Get a ranked list of AI opportunities tailored to your organization's specific context, maturity level, and strategic goals.",
     preview: {
       items: [
-        {
-          priority: "High",
-          name: "Automated Literature Review",
-          impact: "8/10",
-        },
-        {
-          priority: "High",
-          name: "Clinical Trial Matching",
-          impact: "9/10",
-        },
-        {
-          priority: "Medium",
-          name: "Document Summarization",
-          impact: "7/10",
-        },
+        { priority: "High", name: "Automated Literature Review", impact: "8/10" },
+        { priority: "High", name: "Clinical Trial Matching", impact: "9/10" },
+        { priority: "Medium", name: "Document Summarization", impact: "7/10" },
       ],
     },
   },
@@ -54,13 +42,17 @@ const examples = [
 
 export function ExampleOutputs() {
   return (
-    <section id="examples" className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-rose">
+    <section id="examples" className="relative py-28 md:py-36">
+      {/* Background accent */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_100%,rgba(30,58,95,0.15),transparent)]" />
+      
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section header */}
+        <div className="mb-20 text-center">
+          <span className="mb-4 inline-flex items-center rounded-full bg-rose/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-rose">
             What You Get
           </span>
-          <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
+          <h2 className="mb-5 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
             Actionable AI Intelligence
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
@@ -69,93 +61,84 @@ export function ExampleOutputs() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-3">
+        {/* Cards grid */}
+        <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
           {examples.map((example, index) => (
             <div
               key={example.title}
-              className="group relative overflow-hidden rounded-2xl border border-navy/50 bg-gradient-to-b from-card to-background transition-all hover:border-rose/30 hover:shadow-xl hover:shadow-rose/5"
+              className="group overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent transition-all duration-500 hover:border-rose/20"
             >
               {/* Preview area */}
-              <div className="border-b border-navy/30 bg-background/50 p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-wider text-rose">
+              <div className="border-b border-white/5 bg-black/20 p-6">
+                {/* Header */}
+                <div className="mb-5 flex items-center justify-between">
+                  <span className="inline-flex items-center rounded-lg bg-rose/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-rose">
                     {example.category}
                   </span>
-                  <div className="flex gap-1">
-                    <div className="h-2 w-2 rounded-full bg-rose/60" />
-                    <div className="h-2 w-2 rounded-full bg-muted" />
-                    <div className="h-2 w-2 rounded-full bg-muted" />
+                  <div className="flex gap-1.5">
+                    <div className="h-2.5 w-2.5 rounded-full bg-rose/60" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
+                    <div className="h-2.5 w-2.5 rounded-full bg-white/10" />
                   </div>
                 </div>
 
-                {/* Preview content based on type */}
-                {index === 0 && (
-                  <div className="space-y-2">
-                    {example.preview.items?.map((item) => (
+                {/* Preview content */}
+                <div className="space-y-2.5">
+                  {index === 0 &&
+                    example.preview.items?.map((item) => (
                       <div
                         key={item.name}
-                        className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-xl bg-white/[0.03] px-4 py-3 ring-1 ring-white/5"
                       >
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
                           <span
                             className={`h-2 w-2 rounded-full ${
-                              item.priority === "High"
-                                ? "bg-rose"
-                                : "bg-muted-foreground"
+                              item.priority === "High" ? "bg-rose" : "bg-muted-foreground"
                             }`}
                           />
-                          <span className="text-foreground">{item.name}</span>
+                          <span className="text-sm font-medium text-foreground">{item.name}</span>
                         </div>
-                        <span className="text-muted-foreground">
-                          {item.impact}
-                        </span>
+                        <span className="text-sm text-muted-foreground">{item.impact}</span>
                       </div>
                     ))}
-                  </div>
-                )}
 
-                {index === 1 && (
-                  <div className="space-y-2">
-                    {example.preview.risks?.map((risk) => (
+                  {index === 1 &&
+                    example.preview.risks?.map((risk) => (
                       <div
                         key={risk.type}
-                        className="flex items-center justify-between rounded-lg bg-secondary/50 px-3 py-2 text-sm"
+                        className="flex items-center justify-between rounded-xl bg-white/[0.03] px-4 py-3 ring-1 ring-white/5"
                       >
-                        <span className="text-foreground">{risk.type}</span>
+                        <span className="text-sm font-medium text-foreground">{risk.type}</span>
                         <span
-                          className={`rounded px-2 py-0.5 text-xs ${
+                          className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${
                             risk.level === "Low"
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-yellow-500/20 text-yellow-400"
+                              ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
+                              : "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20"
                           }`}
                         >
                           {risk.level}
                         </span>
                       </div>
                     ))}
-                  </div>
-                )}
 
-                {index === 2 && (
-                  <div className="space-y-2">
-                    {example.preview.phases?.map((phase) => (
+                  {index === 2 &&
+                    example.preview.phases?.map((phase) => (
                       <div
                         key={phase.week}
-                        className="flex items-center gap-3 rounded-lg bg-secondary/50 px-3 py-2 text-sm"
+                        className="flex items-center gap-4 rounded-xl bg-white/[0.03] px-4 py-3 ring-1 ring-white/5"
                       >
-                        <span className="w-12 shrink-0 font-mono text-rose">
+                        <span className="w-14 shrink-0 font-mono text-sm font-semibold text-rose">
                           W{phase.week}
                         </span>
-                        <span className="text-foreground">{phase.task}</span>
+                        <span className="text-sm font-medium text-foreground">{phase.task}</span>
                       </div>
                     ))}
-                  </div>
-                )}
+                </div>
               </div>
 
               {/* Description area */}
               <div className="p-6">
-                <h3 className="mb-2 text-lg font-semibold text-foreground">
+                <h3 className="mb-2 text-lg font-semibold tracking-tight text-foreground">
                   {example.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">

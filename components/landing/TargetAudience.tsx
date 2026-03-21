@@ -9,12 +9,7 @@ const audiences = [
       "Regulatory document automation",
     ],
     icon: (
-      <svg
-        className="h-8 w-8"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -34,12 +29,7 @@ const audiences = [
       "Lab operations optimization",
     ],
     icon: (
-      <svg
-        className="h-8 w-8"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -59,12 +49,7 @@ const audiences = [
       "Knowledge management",
     ],
     icon: (
-      <svg
-        className="h-8 w-8"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -78,13 +63,17 @@ const audiences = [
 
 export function TargetAudience() {
   return (
-    <section id="audience" className="relative bg-gradient-to-b from-background via-card to-background py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-rose">
+    <section id="audience" className="relative py-28 md:py-36">
+      {/* Background */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-card/50 via-transparent to-card/50" />
+      
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section header */}
+        <div className="mb-20 text-center">
+          <span className="mb-4 inline-flex items-center rounded-full bg-rose/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-rose">
             Who It's For
           </span>
-          <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
+          <h2 className="mb-5 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
             Built for Life Sciences Innovators
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
@@ -94,43 +83,46 @@ export function TargetAudience() {
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        {/* Cards grid */}
+        <div className="grid gap-6 md:grid-cols-3 md:gap-8">
           {audiences.map((audience) => (
             <div
               key={audience.title}
-              className="group flex flex-col rounded-2xl border border-navy/50 bg-gradient-to-b from-card to-background p-8 transition-all hover:border-rose/30 hover:shadow-xl hover:shadow-rose/5"
+              className="group flex flex-col rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent p-8 transition-all duration-500 hover:border-rose/20 hover:bg-white/[0.04]"
             >
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-rose/10 to-navy/10 text-rose">
+              {/* Icon */}
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-rose/20 to-navy/20 text-rose ring-1 ring-white/5 transition-all duration-500 group-hover:ring-rose/20">
                 {audience.icon}
               </div>
 
-              <h3 className="mb-3 text-xl font-semibold text-foreground">
+              {/* Title */}
+              <h3 className="mb-3 text-xl font-semibold tracking-tight text-foreground">
                 {audience.title}
               </h3>
 
-              <p className="mb-6 flex-1 leading-relaxed text-muted-foreground">
+              {/* Description */}
+              <p className="mb-8 flex-1 leading-relaxed text-muted-foreground">
                 {audience.description}
               </p>
 
+              {/* Features */}
               <ul className="space-y-3">
                 {audience.features.map((feature) => (
                   <li
                     key={feature}
                     className="flex items-center gap-3 text-sm text-muted-foreground"
                   >
-                    <svg
-                      className="h-4 w-4 shrink-0 text-rose"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose/10">
+                      <svg
+                        className="h-3 w-3 text-rose"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
                     {feature}
                   </li>
                 ))}

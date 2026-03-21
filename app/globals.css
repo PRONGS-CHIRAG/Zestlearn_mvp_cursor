@@ -3,22 +3,24 @@
 @tailwind utilities;
 
 :root {
-  --background: #0a0e1a;
-  --foreground: #f1f5f9;
-  --card: #0f1629;
-  --card-foreground: #f1f5f9;
-  --primary: #f472b6;
-  --primary-foreground: #0a0e1a;
-  --secondary: #162033;
-  --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #f472b6;
-  --accent-foreground: #0a0e1a;
+  --background: #080b14;
+  --foreground: #f8fafc;
+  --card: #0c1220;
+  --card-foreground: #f8fafc;
+  --primary: #ec4899;
+  --primary-foreground: #ffffff;
+  --secondary: #111827;
+  --secondary-foreground: #f8fafc;
+  --muted: #1f2937;
+  --muted-foreground: #9ca3af;
+  --accent: #ec4899;
+  --accent-foreground: #ffffff;
   --border: #1e3a5f;
-  --ring: #f472b6;
+  --ring: #ec4899;
   --navy: #1e3a5f;
-  --rose: #f472b6;
+  --navy-light: #2d4a6f;
+  --rose: #ec4899;
+  --rose-light: #f472b6;
   --radius: 0.75rem;
 }
 
@@ -33,5 +35,19 @@ body {
 @layer base {
   * {
     border-color: var(--border);
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    @apply backdrop-blur-xl bg-card/80 border border-white/5;
+  }
+  
+  .glow-rose {
+    box-shadow: 0 0 40px -12px var(--rose);
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-rose to-rose-light bg-clip-text text-transparent;
   }
 }

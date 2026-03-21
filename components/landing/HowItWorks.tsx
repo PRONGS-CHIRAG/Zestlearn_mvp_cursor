@@ -5,12 +5,7 @@ const steps = [
     description:
       "Tell us about your company, team structure, current bottlenecks, and AI maturity level through our guided assessment.",
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -26,12 +21,7 @@ const steps = [
     description:
       "Our AI copilot processes your inputs, identifies opportunities, and maps them against industry best practices and use cases.",
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -47,12 +37,7 @@ const steps = [
     description:
       "Receive a prioritized AI opportunity report with specific use cases, risk assessment, and a practical implementation timeline.",
     icon: (
-      <svg
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -66,13 +51,17 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative py-24 md:py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-16 text-center">
-          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-rose">
+    <section id="how-it-works" className="relative py-28 md:py-36">
+      {/* Background accent */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_0%,rgba(30,58,95,0.15),transparent)]" />
+      
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Section header */}
+        <div className="mb-20 text-center">
+          <span className="mb-4 inline-flex items-center rounded-full bg-rose/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-rose">
             How It Works
           </span>
-          <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
+          <h2 className="mb-5 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
             From Assessment to Action
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
@@ -81,27 +70,30 @@ export function HowItWorks() {
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        {/* Steps grid */}
+        <div className="grid gap-6 md:grid-cols-3 md:gap-8">
           {steps.map((step, index) => (
             <div
               key={step.number}
-              className="group relative rounded-2xl border border-navy/50 bg-gradient-to-b from-card to-background p-8 transition-all hover:border-rose/30 hover:shadow-xl hover:shadow-rose/5"
+              className="group relative rounded-3xl border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent p-8 transition-all duration-500 hover:border-rose/20 hover:bg-white/[0.04]"
             >
               {/* Connection line */}
               {index < steps.length - 1 && (
-                <div className="absolute right-0 top-1/2 hidden h-px w-8 -translate-y-1/2 translate-x-full bg-gradient-to-r from-border to-transparent md:block" />
+                <div className="absolute right-0 top-1/2 hidden h-px w-6 -translate-y-1/2 translate-x-full bg-gradient-to-r from-white/10 to-transparent lg:block" />
               )}
 
-              <div className="mb-6 flex items-center justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose/10 text-rose transition-colors group-hover:bg-rose/20">
+              {/* Step header */}
+              <div className="mb-8 flex items-start justify-between">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose/20 to-rose/5 text-rose ring-1 ring-rose/10 transition-all duration-500 group-hover:ring-rose/20">
                   {step.icon}
                 </div>
-                <span className="text-4xl font-bold text-border transition-colors group-hover:text-rose/30">
+                <span className="text-5xl font-bold text-white/[0.04] transition-all duration-500 group-hover:text-rose/10">
                   {step.number}
                 </span>
               </div>
 
-              <h3 className="mb-3 text-xl font-semibold text-foreground">
+              {/* Step content */}
+              <h3 className="mb-3 text-xl font-semibold tracking-tight text-foreground">
                 {step.title}
               </h3>
               <p className="leading-relaxed text-muted-foreground">
