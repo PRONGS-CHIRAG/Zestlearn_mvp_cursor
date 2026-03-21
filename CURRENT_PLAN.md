@@ -23,9 +23,10 @@ If this loop works end-to-end, the MVP works.
 
 ## Current Milestone
 
-**Milestone 1: Bootstrap the product skeleton and complete the assessment-to-workspace flow**
+**Milestone 1: Complete the assessment-to-workspace flow end-to-end** ✅ scaffold done — now wiring
 
-This milestone should establish the foundation for the rest of the MVP and avoid early over-engineering.
+The shared base scaffold is complete. Routes, schema, types, and folder structure are all frozen. Milestone 1 now moves into feature implementation: wire the assessment form submission through Convex to create a real workspace, and render stored data on the workspace page.
+The working model for implementation is now a single implementer flow with one active slice at a time.
 
 ---
 
@@ -46,15 +47,15 @@ A user should be able to:
 
 ### In Scope
 
-- Next.js app scaffold
-- TypeScript and Tailwind setup
-- initial route structure
-- Convex schema for workspaces and assessments
-- landing page
-- assessment page
-- assessment form validation
-- workspace creation flow
-- workspace page shell with overview data
+- Next.js app scaffold ✅ done
+- TypeScript and Tailwind setup ✅ done
+- initial route structure ✅ done
+- Convex schema for workspaces and assessments ✅ done
+- landing page ✅ component shells done, needs real UI polish
+- assessment page ✅ component shells done
+- assessment form validation ✅ client-side validation implemented
+- workspace creation flow — wire `AssessmentForm` submit to Convex mutations
+- workspace page shell with overview data — wire `OverviewPanel` to Convex query
 
 ### Out of Scope
 
@@ -81,13 +82,14 @@ A user should be able to:
 
 ## Recommended Build Order
 
-1. scaffold app routes and shared UI primitives
-2. define Convex schema and core mutations/queries
-3. build landing page
-4. build assessment form
-5. connect submission flow to backend
-6. build workspace shell and overview panel
-7. verify end-to-end routing and persistence
+1. create the full base folder structure and starter files
+2. freeze routes, folders, schema names, and API contracts
+3. define Convex schema and core mutations/queries
+4. build landing page
+5. build assessment form
+6. connect submission flow to backend
+7. build workspace shell and overview panel
+8. verify end-to-end routing and persistence
 
 ---
 
@@ -110,6 +112,8 @@ A user should be able to:
 - inspect actual code changes before changing milestone status
 - keep tasks small enough for a single Cursor implementation pass
 - record architecture changes in `DECISIONS.md`
+- plan for one active implementation slice at a time
+- do not reintroduce multi-coder or parallel-branch assumptions unless the workflow changes again
 
 ---
 

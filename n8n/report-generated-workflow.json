@@ -1,0 +1,10 @@
+{
+  "name": "ZestLearn — Report Generated",
+  "nodes": [],
+  "connections": {},
+  "active": false,
+  "settings": {},
+  "meta": {
+    "description": "Sends a notification when a report is generated. Trigger: POST webhook from /api/webhook. Expected payload: { workspaceId, reportId, companyName, bottleneckSummary, timestamp }"
+  }
+}

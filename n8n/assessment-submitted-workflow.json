@@ -1,0 +1,10 @@
+{
+  "name": "ZestLearn — Assessment Submitted",
+  "nodes": [],
+  "connections": {},
+  "active": false,
+  "settings": {},
+  "meta": {
+    "description": "Sends a founder notification when an assessment is submitted. Trigger: POST webhook from /api/webhook. Expected payload: { workspaceId, companyName, role, bottleneck, timestamp }"
+  }
+}

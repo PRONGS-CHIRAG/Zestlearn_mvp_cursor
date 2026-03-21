@@ -1,10 +1,17 @@
-# ZestLearn Two-Coder Parallel Build Plan
+# ZestLearn Structured Build Plan
 
 ## Purpose
 
-This document explains how two people can build the ZestLearn MVP asynchronously in parallel and combine their work safely.
+This document explains how to build the ZestLearn MVP as a single implementer while using Codex for planning and Cursor for implementation.
 
-It is based on the existing ZestLearn MVP planning documents, especially:
+Even though the filename remains `structuring_per_coder.md`, this document now assumes:
+
+- one person is coding,
+- work is done sequentially,
+- there is no split ownership between multiple coders,
+- there is no parallel multi-branch collaboration model.
+
+It is based on:
 
 - `zestlearn_cursor_implementation_plan.md`
 - `zestlearn_hackathon_build_checklist.md`
@@ -14,175 +21,96 @@ It is based on the existing ZestLearn MVP planning documents, especially:
 - `DECISIONS.md`
 - `NEXT_TASK.md`
 
-The goal is to let both coders move fast without constantly blocking each other or creating merge chaos.
-
 ---
 
 ## Core Principle
 
-Do not split work randomly by feature ideas.
-Split work by ownership boundaries that minimize file overlap.
+Build the MVP in one clear sequence:
 
-For ZestLearn, the cleanest split is:
+1. create the full base scaffold first,
+2. freeze the structure,
+3. implement one milestone at a time,
+4. keep the repo stable after each completed slice.
 
-- **Coder A:** frontend, page composition, UI components, user flows
-- **Coder B:** backend, Convex, API routes, AI logic, document/report/memory pipelines
-
-This maps well to the documented architecture and reduces collisions.
-
----
-
-## Recommended Roles
-
-## Coder A: Frontend / UX Owner
-
-Primary ownership:
-
-- `app/page.tsx`
-- `app/assessment/page.tsx`
-- `app/workspace/[workspaceId]/page.tsx`
-- `app/workspace/[workspaceId]/report/page.tsx`
-- `app/layout.tsx`
-- `app/globals.css`
-- `components/**`
-- `hooks/**`
-- presentation-only utility code
-
-Primary responsibility:
-
-- landing page
-- assessment UI
-- workspace shell
-- document UI
-- chat UI
-- report UI
-- insights UI
-- loading / empty / error states
+Do not simulate team-based ownership when only one person is coding.
 
 ---
 
-## Coder B: Backend / AI / Data Owner
+## Working Model
 
-Primary ownership:
+Use this division of labor:
 
-- `convex/**`
-- `app/api/**`
-- `lib/**`
-- `types/**`
-- storage / parsing / validation helpers
+- **Codex:** planning, architecture guidance, reviews, handoffs, next-task definition
+- **Cursor:** implementation, file creation, UI work, backend work, iteration
 
-Primary responsibility:
+Use the repo files as the shared memory between them:
 
-- Convex schema
-- queries / mutations / actions
-- assessment submission backend
-- workspace dashboard data contract
-- document upload and summarization pipeline
-- chat backend
-- report generation
-- memory extraction and retrieval
-- event logging / webhooks
-
----
-
-## Shared Ownership Rules
-
-These areas are sensitive and should not be edited casually by both people at the same time:
-
-- `package.json`
-- `tsconfig.json`
-- `tailwind.config.ts`
-- `next.config.ts`
-- `.env.example` or env docs
-- root-level planning files
-
-Recommended rule:
-
-- **Coder A** is the integration owner for repo-level docs and shared planning files.
-- **Coder B** proposes changes to those files through handoff notes or PR comments unless a change is necessary for backend setup.
-
-This reduces avoidable conflicts.
+- `CURRENT_PLAN.md`
+- `IMPLEMENTATION_STATUS.md`
+- `DECISIONS.md`
+- `NEXT_TASK.md`
 
 ---
 
 ## Before You Start
 
-Both coders should do this first:
+Read these first:
 
-1. Read:
-   - `zestlearn_index.md`
-   - `CURRENT_PLAN.md`
-   - `IMPLEMENTATION_STATUS.md`
-   - `DECISIONS.md`
-   - `NEXT_TASK.md`
-2. Read the architecture and implementation docs:
-   - `zestlearn_system_architecture_and_api_contract.md`
-   - `zestlearn_cursor_implementation_plan.md`
-3. Agree on:
-   - package manager
-   - Node version
-   - branch naming
-   - who is integration owner
-   - exact ownership split
-4. Freeze these before coding:
-   - route names
-   - folder structure
-   - core type names
-   - Convex table names
-   - API contract names
+1. `zestlearn_index.md`
+2. `CURRENT_PLAN.md`
+3. `IMPLEMENTATION_STATUS.md`
+4. `DECISIONS.md`
+5. `NEXT_TASK.md`
+6. `zestlearn_system_architecture_and_api_contract.md`
+7. `zestlearn_cursor_implementation_plan.md`
 
-Do not start parallel coding until those are agreed.
+Freeze these before implementing milestone features:
+
+- route names
+- folder structure
+- core type names
+- Convex table names
+- API contract names
 
 ---
 
 ## Required Setup
 
-Both coders should have:
+Use one local working copy and one active task at a time.
 
-- the same repo clone
-- the same Node version
-- the same package manager
-- the same environment variable template
-- access to the same Convex project and model keys
-
-Recommended local setup:
+Recommended setup:
 
 ```bash
 git clone <repo-url>
 cd Zestlearn_mvp_cursor
 git checkout main
 git pull origin main
-```
-
-If using npm:
-
-```bash
 npm install
 ```
 
-If using pnpm instead, both coders must use pnpm consistently.
+If using pnpm instead, use pnpm consistently for the whole project.
+
+Make sure you also have:
+
+- the correct Node version
+- `.env.local` configured
+- access to Convex
+- access to Gemini keys
 
 ---
 
-## Git Branching Model
+## Git Workflow
 
-Use three branch levels:
+Because only one person is coding, keep git simple.
 
-1. `main`
-2. one shared integration branch
-3. short-lived coder feature branches
-
-### Branch Purpose
+### Recommended model
 
 - `main`
-  - stable only
-  - demoable milestones only
-- `codex/integration-mvp`
-  - combined latest work from both coders
-  - integration and checkpoint testing happens here
-- feature branches
-  - one scoped task branch per coder
-  - merge into integration, not directly into `main`
+  - your stable working branch
+- one short-lived task branch at a time
+  - optional, but recommended for clean commits and rollback safety
+
+Do not maintain multiple active implementation branches in parallel.
 
 ---
 
@@ -190,455 +118,272 @@ Use three branch levels:
 
 Use names like:
 
-- `codex/integration-mvp`
-- `codex/a-foundation-ui`
-- `codex/b-foundation-backend`
-- `codex/a-assessment-workspace-ui`
-- `codex/b-convex-assessment-dashboard`
-- `codex/a-documents-chat-ui`
-- `codex/b-documents-chat-pipeline`
-- `codex/a-report-insights-ui`
-- `codex/b-report-memory-backend`
+- `codex/m1-assessment-flow`
+- `codex/m2-workspace-shell`
+- `codex/m3-document-upload`
+- `codex/m4-chat`
+- `codex/m5-report-generation`
+- `codex/m6-memory-polish`
 
-Keep branch names task-scoped.
-Do not keep one huge long-running branch per coder for the whole project.
+Only one of these should be active at a time.
 
 ---
 
 ## Step-By-Step Git Setup
 
-## Step 1: Create the shared integration branch
-
-One person, preferably the integration owner, should run:
+## Step 1: Start from `main`
 
 ```bash
 git checkout main
 git pull origin main
-git checkout -b codex/integration-mvp
-git push -u origin codex/integration-mvp
 ```
 
 ---
 
-## Step 2: Each coder branches off integration
-
-Coder A:
-
-```bash
-git fetch origin
-git checkout codex/integration-mvp
-git pull origin codex/integration-mvp
-git checkout -b codex/a-foundation-ui
-```
-
-Coder B:
-
-```bash
-git fetch origin
-git checkout codex/integration-mvp
-git pull origin codex/integration-mvp
-git checkout -b codex/b-foundation-backend
-```
-
----
-
-## Step 3: Work only inside your owned files
-
-Coder A should avoid editing backend-owned folders.
-Coder B should avoid editing frontend-owned folders.
-
-If a change crosses ownership boundaries:
-
-1. leave a note in `IMPLEMENTATION_STATUS.md`,
-2. flag it in the PR,
-3. only make the change if it is blocking.
-
----
-
-## Step 4: Push feature branch and open PR into integration
+## Step 2: Create one task branch
 
 Example:
 
 ```bash
+git checkout -b codex/m1-assessment-flow
+```
+
+This branch should represent one bounded milestone or one clear implementation slice.
+
+---
+
+## Step 3: Implement the task
+
+Before coding:
+
+1. read `CURRENT_PLAN.md`
+2. read `IMPLEMENTATION_STATUS.md`
+3. read `DECISIONS.md`
+4. read `NEXT_TASK.md`
+
+Then implement only the active task.
+
+---
+
+## Step 4: Commit frequently
+
+Use small, descriptive commits:
+
+```bash
 git add .
-git commit -m "Add assessment UI skeleton"
-git push -u origin codex/a-foundation-ui
+git commit -m "Wire assessment form to Convex workspace creation"
 ```
-
-Open PR:
-
-- base: `codex/integration-mvp`
-- compare: your feature branch
-
-Do not PR directly to `main` during active parallel development.
 
 ---
 
-## Step 5: Sync before merging
+## Step 5: Verify before merging back
 
-Before merging your feature branch:
+Run the relevant checks:
 
 ```bash
-git fetch origin
-git checkout codex/a-foundation-ui
-git rebase origin/codex/integration-mvp
+npm run lint
+npm run build
 ```
 
-Or for Coder B:
+If that is too heavy for every slice, at least run the most relevant local validation and a manual smoke test.
+
+---
+
+## Step 6: Merge back to `main`
+
+Once the slice is stable:
 
 ```bash
-git fetch origin
-git checkout codex/b-foundation-backend
-git rebase origin/codex/integration-mvp
+git checkout main
+git pull origin main
+git merge --no-ff codex/m1-assessment-flow
+git push origin main
 ```
 
-Then run the relevant local checks.
-
----
-
-## Step 6: Merge into integration
-
-After checks pass and conflicts are resolved:
-
-- squash merge into `codex/integration-mvp`, or
-- use a normal merge if commit history is intentionally meaningful
-
-Recommended for MVP speed:
-
-- squash merge feature branches into integration
-
----
-
-## Step 7: Refresh local state after teammate merge
-
-After the other coder merges:
+Then delete the completed task branch:
 
 ```bash
-git fetch origin
-git checkout codex/integration-mvp
-git pull origin codex/integration-mvp
+git branch -d codex/m1-assessment-flow
 ```
 
-Then create your next short-lived branch from updated integration:
+If pushed remotely:
 
 ```bash
-git checkout -b codex/a-next-task
+git push origin --delete codex/m1-assessment-flow
 ```
 
-or
+---
+
+## Step 7: Start the next task branch
 
 ```bash
-git checkout -b codex/b-next-task
+git checkout main
+git pull origin main
+git checkout -b codex/m2-next-task
 ```
 
----
-
-## Step 8: Merge integration to main only at stable checkpoints
-
-When a checkpoint is stable:
-
-1. create a PR from `codex/integration-mvp` to `main`
-2. run final smoke checks
-3. merge only when the current milestone is working end-to-end
-
-Do not continuously drip unstable code into `main`.
+Repeat the same loop.
 
 ---
 
-## Asynchronous Working Protocol
+## Shared Memory Workflow
 
-Because both coders are working asynchronously, do not rely on chat messages alone.
-Use the repo as the shared memory.
+At the start of each session:
 
-### Required shared files
+1. pull latest `main`
+2. read the four shared memory files
+3. inspect the current code state
+4. confirm the active task
 
-- `CURRENT_PLAN.md`
-- `IMPLEMENTATION_STATUS.md`
-- `DECISIONS.md`
-- `NEXT_TASK.md`
+At the end of each session:
 
-### Daily / session-start protocol
+1. update `IMPLEMENTATION_STATUS.md`
+2. update `NEXT_TASK.md` if the next slice is clear
+3. update `DECISIONS.md` only if an architectural decision changed
+4. commit the documentation updates with the implementation work
 
-At the start of each session, each coder should:
+Recommended ownership:
 
-1. pull latest `codex/integration-mvp`
-2. read the four shared files
-3. read latest merged diff if needed
-4. confirm current owned task
-5. start a new short-lived branch
-
-### End-of-session protocol
-
-Before ending a session, each coder should:
-
-1. push branch
-2. update `IMPLEMENTATION_STATUS.md`
-3. note blockers or contract changes
-4. identify the next integration dependency
-
-Recommended rule:
-
-- only the integration owner updates `CURRENT_PLAN.md` and `NEXT_TASK.md`
-- both coders can append implementation notes to `IMPLEMENTATION_STATUS.md`
-- architectural changes go into `DECISIONS.md`
+- Codex updates `CURRENT_PLAN.md` and proposes `NEXT_TASK.md`
+- Cursor implements the task
+- after implementation, shared memory files are refreshed to match reality
 
 ---
 
-## Timeboxed Parallel Plan
+## Timeboxed Implementation Plan
 
-This plan follows the 24-hour implementation structure but adapts it for two coders.
+This follows the existing 24-hour implementation plan, but for one implementer working sequentially.
 
-## Hours 0-2: Foundation and Contract Freeze
+## Hours 0-2: Base Scaffold and Contract Freeze
 
-### Shared Goal
+### Goal
 
-Create enough shared structure that both coders can split cleanly afterward.
+Create the full base folder structure and placeholder files before feature work begins.
 
-### Coder A
+### Tasks
 
-- create initial Next.js app scaffold if not already present
-- set up route skeleton
-- create `app/layout.tsx`, `app/page.tsx`, `app/assessment/page.tsx`
-- set up `components/` structure
-- set up base visual shell
+- create Next.js app scaffold
+- configure TypeScript and Tailwind
+- create app route skeleton
+- create `components/`, `convex/`, `lib/`, `types/`, `hooks/`, `n8n/`
+- create placeholder starter files
+- freeze routes, schema names, and API contracts
 
-### Coder B
+### Done When
 
-- set up `convex/` structure
-- define schema skeleton
-- create `lib/`, `types/`, and `app/api/` folder skeleton
-- define initial shared contract types
-- document any backend assumptions
-
-### Integration Checkpoint at Hour 2
-
-Must be true:
-
-- route and folder structure are frozen
-- table names are frozen
-- API operation names are frozen
-- ownership split is frozen
-
-Merge both branches into `codex/integration-mvp` before continuing.
+- base scaffold exists
+- route structure exists
+- folder structure matches architecture
+- starter files compile cleanly
 
 ---
 
 ## Hours 2-5: Landing and Assessment Flow
 
-### Shared Goal
+### Goal
 
 Complete the assessment-to-workspace creation flow.
 
-### Coder A
+### Tasks
 
-- build landing page sections
+- build landing page
 - build assessment form UI
 - add client-side validation
-- wire submit UX, loading state, and redirect handling
+- wire form submission to Convex
+- create workspace and assessment records
+- redirect to `/workspace/[workspaceId]`
 
-Owned files mainly:
+### Done When
 
-- `app/page.tsx`
-- `app/assessment/page.tsx`
-- `components/landing/**`
-- `components/assessment/**`
-
-### Coder B
-
-- implement Convex schema for workspaces and assessments
-- implement workspace creation and assessment submission backend
-- implement dashboard data query contract
-- create validation helpers and types if needed
-
-Owned files mainly:
-
-- `convex/schema.ts`
-- `convex/workspaces.ts`
-- `convex/assessments.ts`
-- `lib/validation/**`
-- `types/**`
-
-### Integration Checkpoint at Hour 5
-
-Must be true:
-
-- assessment payload shape is stable
-- submission works end-to-end
-- redirect target is confirmed
-
-Merge both branches and smoke test assessment submission.
+- form validates
+- submit works
+- redirect works
+- backend records exist
 
 ---
 
 ## Hours 5-8: Workspace Shell
 
-### Shared Goal
+### Goal
 
-Create a real workspace page backed by stored data.
+Render a real workspace backed by stored data.
 
-### Coder A
+### Tasks
 
 - build workspace shell
-- build overview, documents, chat, reports, and insights placeholder panels
-- render real workspace and assessment summary data
+- build overview panel
+- add documents/chat/reports/insights placeholders
+- wire overview to real dashboard query
 
-Owned files mainly:
+### Done When
 
-- `app/workspace/[workspaceId]/page.tsx`
-- `components/workspace/**`
-
-### Coder B
-
-- finalize workspace dashboard query
-- ensure response shape matches UI needs
-- add events logging if helpful
-- expose stable dashboard data for overview panel
-
-Owned files mainly:
-
-- `convex/workspaces.ts`
-- `convex/events.ts`
-- `types/workspace.ts`
-
-### Integration Checkpoint at Hour 8
-
-Must be true:
-
-- workspace loads with real data
-- overview panel reflects backend state
-- panel placeholders are visible for future modules
+- workspace loads
+- overview reflects stored company and assessment data
 
 ---
 
 ## Hours 8-12: Document Upload and Summarization
 
-### Shared Goal
+### Goal
 
-Allow one document to be uploaded, processed, and displayed.
+Allow one file upload and one processed summary.
 
-### Coder A
+### Tasks
 
 - build upload dropzone
-- build document card
-- build processing status badge
-- connect documents panel to upload and display states
-
-Owned files mainly:
-
-- `components/documents/**`
-- `components/workspace/DocumentsPanel.tsx`
-
-### Coder B
-
+- build document cards and status badge
 - implement upload route
-- implement documents table and backend functions
-- implement text extraction helper
-- implement summarization helper
+- implement document record creation
+- implement extraction and summarization helpers
 - store summary and tags
 
-Owned files mainly:
+### Done When
 
-- `app/api/upload/route.ts`
-- `convex/documents.ts`
-- `lib/documents/**`
-- related `types/document.ts`
-
-### Integration Checkpoint at Hour 12
-
-Must be true:
-
-- user can upload at least one supported file
-- processing status changes correctly
-- summary appears in workspace
+- one supported file uploads
+- processing state changes
+- summary displays in workspace
 
 ---
 
 ## Hours 12-16: Consultant Chat
 
-### Shared Goal
+### Goal
 
-Support one contextual question-answer exchange.
+Support one contextual question-answer flow.
 
-### Coder A
+### Tasks
 
-- build chat window
-- build chat input
-- build chat message UI
-- add prompt starters
-- connect chat panel to backend request flow
+- build chat UI
+- store messages in Convex
+- build chat context assembly
+- call Gemini
+- store and display assistant response
 
-Owned files mainly:
+### Done When
 
-- `components/chat/**`
-- `components/workspace/ChatPanel.tsx`
-
-### Coder B
-
-- implement chat API route
-- implement chat storage in Convex
-- assemble chat context
-- implement Gemini provider wrapper
-- save assistant response
-
-Owned files mainly:
-
-- `app/api/chat/route.ts`
-- `convex/chat.ts`
-- `lib/ai/**`
-- `types/chat.ts`
-
-### Integration Checkpoint at Hour 16
-
-Must be true:
-
-- user message persists
-- assistant response returns
-- backend uses assessment/docs context
+- user can send a message
+- assistant responds
+- response uses workspace context
 
 ---
 
 ## Hours 16-20: Report Generation
 
-### Shared Goal
+### Goal
 
-Generate and render the main opportunity report.
+Generate and render the core opportunity report.
 
-### Coder A
+### Tasks
 
-- build reports panel generate button
-- build report page
-- build ReportView, UseCaseCard, RoadmapSection, RiskSection
-- render structured report cleanly
+- build report route
+- build report generation helper
+- validate structured report output
+- render report UI
+- store report in Convex
 
-Owned files mainly:
+### Done When
 
-- `components/report/**`
-- `components/workspace/ReportsPanel.tsx`
-- `app/workspace/[workspaceId]/report/page.tsx`
-
-### Coder B
-
-- implement report route
-- implement report prompt
-- implement report generator
-- implement parser / validator
-- implement markdown renderer
-- save report in Convex
-
-Owned files mainly:
-
-- `app/api/report/route.ts`
-- `convex/reports.ts`
-- `lib/reports/**`
-- `lib/ai/prompts/report.ts`
-- `lib/ai/parsers/reportParser.ts`
-- `types/report.ts`
-
-### Integration Checkpoint at Hour 20
-
-Must be true:
-
-- report generates from real workspace context
+- report generates from real context
 - report is stored
 - report renders clearly
 
@@ -646,217 +391,76 @@ Must be true:
 
 ## Hours 20-22: Memory Layer
 
-### Shared Goal
+### Goal
 
-Show the collective memory concept in a visible way.
+Show the reusable insight layer.
 
-### Coder A
+### Tasks
 
-- build insights panel
-- render insight cards
-- add polished empty states for no insights yet
+- extract insights from report
+- save memory patterns
+- retrieve memory patterns
+- render insights panel
+- seed demo patterns if needed
 
-Owned files mainly:
+### Done When
 
-- `components/workspace/InsightsPanel.tsx`
-- any supporting shared UI states
-
-### Coder B
-
-- implement memory extraction helper
-- implement memory storage and retrieval
-- seed a few shared patterns
-- connect report generation to memory saving
-
-Owned files mainly:
-
-- `convex/memory.ts`
-- `lib/memory/**`
-- `lib/reports/extractInsights.ts`
-- `types/memory.ts`
-
-### Integration Checkpoint at Hour 22
-
-Must be true:
-
-- at least one insight appears after report generation
-- insight text feels related to workspace context
+- at least one insight appears
+- insight feels relevant
 
 ---
 
-## Hours 22-24: Polish, Errors, Demo Prep
+## Hours 22-24: Polish and Demo Prep
 
-### Shared Goal
+### Goal
 
-Make the MVP safe to demo.
+Make the MVP demo-ready.
 
-### Coder A
+### Tasks
 
 - polish loading states
-- polish empty states
-- fix layout issues
-- smooth end-to-end UX flow
+- polish empty and error states
+- fix layout and UX issues
+- run final smoke tests
+- verify the end-to-end flow
 
-### Coder B
+### Final Success Condition
 
-- harden error handling
-- add webhook / logging if time permits
-- run scenario smoke tests
-- fix backend stability issues
+The MVP is ready when a user can go from:
 
-### Final Checkpoint at Hour 24
+`assessment -> workspace -> upload -> chat -> report -> insight`
 
-Must be true:
-
-- landing page works
-- assessment works
-- workspace works
-- one document upload works
-- one contextual chat turn works
-- one report generates
-- one insight appears
-
-Then merge `codex/integration-mvp` into `main`.
-
----
-
-## Integration Cadence
-
-Do not wait until the end of the day to combine.
-
-Recommended merge cadence:
-
-- Hour 2
-- Hour 5
-- Hour 8
-- Hour 12
-- Hour 16
-- Hour 20
-- Hour 22
-- Hour 24
-
-At each checkpoint:
-
-1. both coders push current branches
-2. both update `IMPLEMENTATION_STATUS.md`
-3. integration owner rebases / merges into `codex/integration-mvp`
-4. smoke test current milestone
-5. update `CURRENT_PLAN.md` and `NEXT_TASK.md`
-6. both coders branch again from latest integration
-
----
-
-## How To Avoid Merge Conflicts
-
-1. Keep ownership boundaries strict.
-2. Keep branches short-lived.
-3. Merge at the checkpoint cadence above.
-4. Do not let both people modify the same component family casually.
-5. Freeze contracts early:
-   - route names
-   - schema names
-   - response types
-   - report JSON shape
-6. Put contract changes in `DECISIONS.md` before the other coder starts the next slice.
-
-If conflict risk appears, prefer one coder adding a small adapter rather than both rewriting a shared file.
-
----
-
-## Checks Before Merging to Integration
-
-Each coder should run the relevant checks locally before opening or merging a PR.
-
-Recommended checks:
-
-```bash
-npm run lint
-npm run build
-```
-
-If tests exist later:
-
-```bash
-npm test
-```
-
-For MVP speed, if full build is too slow, at least run the most relevant check for your slice plus a manual smoke test.
+without a broken step in the main happy path.
 
 ---
 
 ## Suggested Commit Style
 
-Keep commits small and descriptive.
+Use descriptive commits:
 
-Examples:
+- `Scaffold app routes and shared component folders`
+- `Wire assessment flow to Convex`
+- `Build workspace overview with live query`
+- `Implement document upload pipeline`
+- `Add consultant chat with Gemini context`
+- `Implement structured report generation`
 
-- `Add landing page hero and CTA flow`
-- `Implement workspace and assessment Convex schema`
-- `Add upload dropzone and document cards`
-- `Implement report parser and markdown renderer`
+Avoid vague commits like:
 
-Avoid giant mixed commits like:
-
-- `work on app`
+- `updates`
 - `fix stuff`
-
----
-
-## Handoff Template For Each Coder
-
-At the end of a work block, add a short note to `IMPLEMENTATION_STATUS.md` using this structure:
-
-```md
-### Coder A Update
-
-#### Just Completed
-- ...
-
-#### Files Changed
-- ...
-
-#### What Works
-- ...
-
-#### Blocking Dependencies
-- ...
-
-#### Next Suggested Integration Point
-- ...
-```
-
-Coder B should use the same structure.
-
-This makes asynchronous collaboration much easier.
-
----
-
-## If One Coder Finishes Early
-
-Do not immediately jump into the other coder's ownership area.
-
-Take work from this order:
-
-1. bug fixes in your owned files
-2. polish in your owned files
-3. test coverage or smoke tests
-4. documentation and shared memory updates
-5. only then, help in the other area after alignment
-
-This prevents accidental merge churn near the end.
+- `more changes`
 
 ---
 
 ## Final Recommended Operating Model
 
-If you want the cleanest two-person setup for this MVP, use this exact model:
+Use this exact model:
 
-- **Coder A:** frontend / UX / composition / states
-- **Coder B:** backend / Convex / AI / pipeline logic
-- **Shared memory:** repo files, not chat memory
-- **Shared branch:** `codex/integration-mvp`
-- **Feature branches:** short-lived, task-scoped, branched from integration
-- **Merge rhythm:** every major timebox checkpoint
-- **Main branch:** stable only
+- one coder implementing sequentially
+- Codex for planning and task shaping
+- Cursor for execution
+- one active task branch at a time
+- shared memory files updated after each real milestone
 
-This gives you the best chance of moving fast in parallel while still ending with a codebase that can actually be combined and demoed.
+That is the cleanest setup for the current ZestLearn workflow.

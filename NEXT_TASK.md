@@ -11,14 +11,13 @@ If multiple tasks are listed, Cursor should complete them in order and stop afte
 
 ## Active Task
 
-**Scaffold the initial ZestLearn app and route structure**
+**Wire the assessment-to-workspace flow end-to-end using Convex**
 
 ---
 
 ## Why This Task Next
 
-The project currently has planning documentation but no confirmed application scaffold.
-The fastest way to preserve momentum is to create the implementation foundation that later milestones will build on.
+The shared base scaffold is complete. All routes, schemas, type contracts, and folder structure are in place and TypeScript compiles cleanly. The next bounded task is to connect the existing `AssessmentForm` UI to the real Convex backend so that submitting the form creates a workspace + assessment record and routes the user to the live workspace page backed by stored data. This closes Milestone 1.
 
 ---
 
@@ -26,41 +25,48 @@ The fastest way to preserve momentum is to create the implementation foundation 
 
 Read these first:
 
-1. `zestlearn_index.md`
-2. `CURRENT_PLAN.md`
-3. `IMPLEMENTATION_STATUS.md`
-4. `DECISIONS.md`
-5. `zestlearn_system_architecture_and_api_contract.md`
-6. `zestlearn_cursor_implementation_plan.md`
+1. `CURRENT_PLAN.md`
+2. `IMPLEMENTATION_STATUS.md`
+3. `DECISIONS.md`
+4. `zestlearn_system_architecture_and_api_contract.md` — section 10.1 (Assessment API Contract) and section 5.1 (Assessment Flow)
 
 ---
 
 ## Task Scope
 
-Create the initial project structure for the ZestLearn MVP:
+### Step 1 — Initialize Convex
+```bash
+npx convex dev
+```
+This generates `convex/_generated/` and makes Convex queries/mutations callable from the frontend.
 
-- Next.js app scaffold
-- TypeScript setup
-- Tailwind setup
-- route skeleton for:
-  - `/`
-  - `/assessment`
-  - `/workspace/[workspaceId]`
-  - `/workspace/[workspaceId]/report`
-- placeholder shared layout
-- placeholder component folders
-- placeholder Convex folder structure
-- minimal starter pages that compile cleanly
+### Step 2 — Wire AssessmentForm submission
+- In `components/assessment/AssessmentForm.tsx`, replace the `console.log` placeholder in `handleSubmit` with real Convex calls:
+  1. Call `createWorkspace` mutation with company fields
+  2. Call `submitAssessment` mutation with bottleneck/outcome fields
+  3. On success, `router.push(/workspace/${workspaceId})`
+
+### Step 3 — Add ConvexProvider to layout
+- Wrap `app/layout.tsx` children with `<ConvexProvider client={convex}>` using the `NEXT_PUBLIC_CONVEX_URL` env var
+
+### Step 4 — Wire OverviewPanel to real data
+- In `components/workspace/OverviewPanel.tsx`, use the `useQuery` hook to call `getWorkspaceDashboardData` and render:
+  - company name, type, size, department, role, AI maturity
+  - bottleneck and desired outcome from the assessment
+
+### Step 5 — Update WorkspaceShell to pass real data
+- Ensure `WorkspaceShell` receives `workspaceId` from route params and passes it down to panels
 
 ---
 
 ## Guardrails
 
-- do not implement chat, upload, reports, or memory logic yet
-- do not over-engineer abstractions
-- keep route files thin
-- preserve the documented architecture
-- prefer clean placeholders over half-built features
+- do not implement document upload, chat, reports, or memory in this task
+- do not change schema names, route names, or type interfaces
+- keep route files thin — delegate to components and Convex hooks
+- preserve the architecture: AI logic stays out of UI files
+- assume a single-implementer workflow while executing this task
+- update `IMPLEMENTATION_STATUS.md` when done
 
 ---
 
@@ -68,11 +74,11 @@ Create the initial project structure for the ZestLearn MVP:
 
 This task is done when:
 
-- the app structure exists
-- the route files exist
-- the project compiles
-- the folder layout matches the architecture closely enough for the next milestone
-- `IMPLEMENTATION_STATUS.md` is updated with what was created
+- `npx convex dev` runs without errors
+- submitting the assessment form creates a real workspace and assessment in Convex
+- the user is routed to `/workspace/[workspaceId]`
+- the workspace overview panel renders the stored company and assessment data
+- no console errors on the happy path
 
 ---
 
@@ -80,6 +86,6 @@ This task is done when:
 
 Cursor should update:
 
-- `IMPLEMENTATION_STATUS.md`
-- `NEXT_TASK.md` with the next bounded task, or leave a clear blocker note
-- `DECISIONS.md` only if implementation forced a real architecture change
+- `IMPLEMENTATION_STATUS.md` — mark assessment flow as wired
+- `NEXT_TASK.md` — set next task to document upload pipeline (Milestone 2 start)
+- `DECISIONS.md` only if Convex initialization forced a real architecture change

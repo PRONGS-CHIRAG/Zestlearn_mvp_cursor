@@ -155,3 +155,57 @@ Use this format for future entries:
 **Implication**
 
 ...
+
+---
+
+## Decision 6
+
+**Title:** Create the full scaffold before milestone feature implementation begins
+
+**Status:** active
+
+**Decision**
+
+The full base folder structure and placeholder files should be created before milestone feature implementation begins.
+
+**Why**
+
+This reduces structural churn, locks the architecture early, and makes later implementation work more predictable.
+
+**Implication**
+
+The first implementation checkpoint should establish:
+
+- root config layout
+- app route skeleton
+- component folders
+- Convex folders
+- API route folders
+- `lib/` folders
+- `types/` folders
+- placeholder starter files
+
+Once that scaffold exists, implementation should continue sequentially one milestone at a time.
+
+---
+
+## Decision 7
+
+**Title:** Use a single-implementer workflow for the current build
+
+**Status:** active
+
+**Decision**
+
+The current ZestLearn build should assume one person is implementing the codebase, with Codex used for planning and Cursor used for execution.
+
+**Why**
+
+This matches the actual working setup and avoids unnecessary branch, ownership, and coordination complexity in the docs and handoff process.
+
+**Implication**
+
+- keep one active implementation slice at a time
+- avoid parallel coder ownership language
+- use simple git flow with `main` plus one optional short-lived task branch
+- keep shared memory files aligned to solo implementation unless the workflow changes again

@@ -1,0 +1,10 @@
+{
+  "name": "ZestLearn — Lead Capture",
+  "nodes": [],
+  "connections": {},
+  "active": false,
+  "settings": {},
+  "meta": {
+    "description": "Logs new leads when a user starts an assessment. Trigger: POST webhook from /api/webhook. Expected payload: { companyName, role, department, timestamp }"
+  }
+}
