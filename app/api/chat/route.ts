@@ -152,6 +152,39 @@ export async function POST(req: NextRequest) {
       metadata: { modelId, validated: validation.valid, reason: validation.reason },
     });
 
+    // Selective chat memory extraction (every 5th assistant message for this workspace)
+    try {
+      const allMessages = await convex.query(
+        api.chat.listRecentMessagesByWorkspace,
+        { workspaceId: wsId, limit: 50 }
+      );
+      const assistantCount = allMessages?.filter((m) => m.role === "assistant").length ?? 0;
+      if (assistantCount > 0 && assistantCount % 5 === 0) {
+        const { extractPatternsFromChat } = await import("@/lib/memory/extractFromChat");
+        const { savePatterns } = await import("@/lib/memory/savePatterns");
+        const chatPatterns = extractPatternsFromChat(
+          (allMessages ?? []).map((m) => ({ role: m.role, content: m.content })),
+          workspaceId
+        );
+        if (chatPatterns.length > 0) {
+          await savePatterns(chatPatterns, (p) =>
+            convex.mutation(api.memory.saveMemoryPattern, {
+              workspaceId: p.workspaceId ? (p.workspaceId as Id<"workspaces">) : undefined,
+              scope: p.scope,
+              category: p.category,
+              functionArea: p.functionArea,
+              industry: p.industry,
+              patternText: p.patternText,
+              confidenceScore: p.confidenceScore,
+              sourceType: p.sourceType,
+            })
+          );
+        }
+      }
+    } catch (chatExtractErr) {
+      console.error("[chat] memory extraction failed (non-fatal):", chatExtractErr);
+    }
+
     return NextResponse.json({
       success: true,
       reply: validation.sanitized,

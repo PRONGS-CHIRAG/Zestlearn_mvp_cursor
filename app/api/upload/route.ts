@@ -149,6 +149,34 @@ export async function POST(req: NextRequest) {
       tags,
     });
 
+    // ── 8. Extract document-derived memory patterns ────────────────────
+    if (aiStatus === "success") {
+      try {
+        const { extractPatternsFromDocuments } = await import("@/lib/memory/extractFromDocuments");
+        const { savePatterns } = await import("@/lib/memory/savePatterns");
+        const docPatterns = extractPatternsFromDocuments(
+          [{ fileName: file.name, summary, tags }],
+          workspaceId
+        );
+        if (docPatterns.length > 0) {
+          await savePatterns(docPatterns, (p) =>
+            convex.mutation(api.memory.saveMemoryPattern, {
+              workspaceId: p.workspaceId ? (p.workspaceId as Id<"workspaces">) : undefined,
+              scope: p.scope,
+              category: p.category,
+              functionArea: p.functionArea,
+              industry: p.industry,
+              patternText: p.patternText,
+              confidenceScore: p.confidenceScore,
+              sourceType: p.sourceType,
+            })
+          );
+        }
+      } catch (memErr) {
+        console.error("[upload] document memory extraction failed (non-fatal):", memErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       documentId,

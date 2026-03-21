@@ -1,4 +1,3 @@
-// Shared memory patterns seeded for demo readiness
 export const SEED_MEMORY_PATTERNS = [
   {
     category: "first_pilot",
@@ -7,6 +6,7 @@ export const SEED_MEMORY_PATTERNS = [
     scope: "shared" as const,
     sourceType: "seed" as const,
     industry: "pharma/biotech",
+    confidenceScore: 85,
   },
   {
     category: "maturity_guidance",
@@ -15,6 +15,7 @@ export const SEED_MEMORY_PATTERNS = [
     scope: "shared" as const,
     sourceType: "seed" as const,
     industry: "pharma/biotech",
+    confidenceScore: 90,
   },
   {
     category: "knowledge_fragmentation",
@@ -23,6 +24,7 @@ export const SEED_MEMORY_PATTERNS = [
     scope: "shared" as const,
     sourceType: "seed" as const,
     industry: "pharma/biotech",
+    confidenceScore: 80,
   },
   {
     category: "operations",
@@ -31,5 +33,42 @@ export const SEED_MEMORY_PATTERNS = [
     scope: "shared" as const,
     sourceType: "seed" as const,
     industry: "pharma/biotech",
+    confidenceScore: 82,
+  },
+  {
+    category: "compliance_constraint",
+    patternText:
+      "Regulated pharma environments benefit from AI solutions with audit trails and validation-ready outputs to meet GxP requirements.",
+    scope: "shared" as const,
+    sourceType: "seed" as const,
+    industry: "pharma/biotech",
+    confidenceScore: 88,
+  },
+  {
+    category: "bottleneck",
+    patternText:
+      "Cross-functional coordination delays are a top bottleneck in mid-size pharma companies attempting to adopt AI.",
+    scope: "shared" as const,
+    sourceType: "seed" as const,
+    industry: "pharma/biotech",
+    confidenceScore: 78,
+  },
+  {
+    category: "use_case",
+    patternText:
+      "Adverse event monitoring and pharmacovigilance signal detection are high-impact, regulation-friendly first AI use cases.",
+    scope: "shared" as const,
+    sourceType: "seed" as const,
+    industry: "pharma/biotech",
+    confidenceScore: 84,
+  },
+  {
+    category: "risk",
+    patternText:
+      "Deploying AI without clear data governance policies increases regulatory risk and slows enterprise adoption in life sciences.",
+    scope: "shared" as const,
+    sourceType: "seed" as const,
+    industry: "pharma/biotech",
+    confidenceScore: 86,
   },
 ];

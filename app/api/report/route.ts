@@ -105,20 +105,30 @@ export async function POST(req: NextRequest) {
       renderedMarkdown,
     });
 
-    // Extract and save memory insights
+    // Extract and save memory insights with normalization/privacy
     try {
-      const insights = extractInsightsFromReport(structuredReport, workspaceId);
-      for (const insight of insights) {
-        await convex.mutation(api.memory.saveMemoryPattern, {
-          workspaceId: insight.workspaceId ? (insight.workspaceId as Id<"workspaces">) : undefined,
-          scope: insight.scope,
-          category: insight.category,
-          functionArea: insight.functionArea,
-          industry: insight.industry,
-          patternText: insight.patternText,
-          sourceType: insight.sourceType,
-        });
-      }
+      const reportInsights = extractInsightsFromReport(structuredReport, workspaceId);
+      const { savePatterns } = await import("@/lib/memory/savePatterns");
+      const saved = await savePatterns(reportInsights, (p) =>
+        convex.mutation(api.memory.saveMemoryPattern, {
+          workspaceId: p.workspaceId ? (p.workspaceId as Id<"workspaces">) : undefined,
+          scope: p.scope,
+          category: p.category,
+          functionArea: p.functionArea,
+          industry: p.industry,
+          patternText: p.patternText,
+          confidenceScore: p.confidenceScore,
+          sourceType: p.sourceType,
+        })
+      );
+      console.log(`[report] saved ${saved} memory patterns`);
+
+      // Log event
+      await convex.mutation(api.events.logEvent, {
+        workspaceId: wsId,
+        eventType: "memory_patterns_saved",
+        payload: { source: "report", count: saved },
+      });
     } catch (insightErr) {
       console.error("[report] insight extraction failed (non-fatal):", insightErr);
     }
