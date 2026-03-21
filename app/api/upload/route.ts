@@ -109,27 +109,34 @@ export async function POST(req: NextRequest) {
     let summary = "Document uploaded. AI summary not available.";
     let tags: string[] = [];
     let keyFacts: string[] = [];
+    let aiStatus: "success" | "skipped" | "failed" = "skipped";
+    let aiError: string | undefined;
 
     const geminiKey = process.env.GEMINI_API_KEY;
-    if (geminiKey && extraction.text.trim()) {
+    if (!geminiKey) {
+      aiError = "GEMINI_API_KEY not configured on server";
+      console.warn("[upload] GEMINI_API_KEY not set — skipping AI summarization");
+    } else if (!extraction.text.trim()) {
+      aiError = "No text extracted from document";
+    } else {
       try {
         const provider = new GeminiProvider(geminiKey);
         const result = await summarizeDocument(extraction.text, provider);
         summary = result.summary;
         tags = result.tags;
         keyFacts = result.keyFacts;
+        aiStatus = "success";
 
-        // Embed keyFacts into the stored summary so the report builder can
-        // read them from the single `summary` field without schema changes.
         if (keyFacts.length > 0) {
           summary =
             result.summary +
             "\n\nKey Facts:\n" +
             keyFacts.map((f) => `- ${f}`).join("\n");
         }
-      } catch (aiError) {
-        // Non-fatal: proceed without summary rather than failing the upload
-        console.error("[upload] AI processing failed:", aiError);
+      } catch (err) {
+        aiStatus = "failed";
+        aiError = err instanceof Error ? err.message : String(err);
+        console.error("[upload] AI processing failed:", err);
         summary = "Document uploaded. AI summarization failed — will retry on next access.";
       }
     }
@@ -147,10 +154,12 @@ export async function POST(req: NextRequest) {
       documentId,
       fileName: file.name,
       summary: keyFacts.length > 0
-        ? summary.split("\n\nKey Facts:")[0]  // return clean summary in response
+        ? summary.split("\n\nKey Facts:")[0]
         : summary,
       keyFacts,
       tags,
+      aiStatus,
+      ...(aiError && { aiError }),
     });
   } catch (error) {
     console.error("[upload] unhandled error:", error);

@@ -173,6 +173,7 @@ export default function DocumentsPanel({ workspaceId }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadInfo, setUploadInfo] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch real documents from Convex (auto-refreshes via subscription)
@@ -187,6 +188,7 @@ export default function DocumentsPanel({ workspaceId }: Props) {
 
   async function uploadFile(file: File) {
     setUploadError(null);
+    setUploadInfo(null);
     setIsUploading(true);
 
     try {
@@ -199,6 +201,13 @@ export default function DocumentsPanel({ workspaceId }: Props) {
 
       if (!res.ok || !json.success) {
         setUploadError(json.error || "Upload failed. Please try again.");
+        return;
+      }
+
+      if (json.aiStatus === "skipped" || json.aiStatus === "failed") {
+        setUploadInfo(
+          `"${file.name}" uploaded but AI summary ${json.aiStatus === "skipped" ? "was skipped" : "failed"}: ${json.aiError || "unknown reason"}. The document is saved and can be re-processed later.`
+        );
       }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed.");
@@ -318,6 +327,17 @@ export default function DocumentsPanel({ workspaceId }: Props) {
           <button onClick={() => setUploadError(null)} className="ml-auto text-xs text-red-400/60 hover:text-red-400">
             Dismiss
           </button>
+        </div>
+      )}
+
+      {/* AI warning */}
+      {uploadInfo && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+          <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.168 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+          </svg>
+          <p className="text-sm text-amber-400/90">{uploadInfo}</p>
+          <button onClick={() => setUploadInfo(null)} className="ml-auto text-xs text-amber-400/60 hover:text-amber-400">Dismiss</button>
         </div>
       )}
 

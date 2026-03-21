@@ -7,7 +7,7 @@ export class GeminiProvider implements AIProvider {
 
   constructor(
     apiKey = process.env.GEMINI_API_KEY ?? "",
-    model = "gemini-1.5-flash"
+    model = "gemini-2.5-flash"
   ) {
     if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
     this.genAI = new GoogleGenerativeAI(apiKey);
