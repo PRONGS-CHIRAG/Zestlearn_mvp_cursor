@@ -1,9 +1,41 @@
 const steps = [
   {
     number: "01",
-    title: "Share Your Context",
+    title: "Tell Us About Your Team",
     description:
-      "Tell us about your company, team structure, current bottlenecks, and AI maturity level through our guided assessment.",
+      "Share your team structure, current workflows, and the bottlenecks slowing you down through our guided assessment.",
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    number: "02",
+    title: "Upload Internal Context",
+    description:
+      "Securely upload relevant documents, SOPs, or data samples to give our AI deeper insight into your operations.",
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+        />
+      </svg>
+    ),
+  },
+  {
+    number: "03",
+    title: "Chat with AI Consultant",
+    description:
+      "Have a guided conversation with our AI copilot to refine your needs and explore potential AI applications.",
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
@@ -16,26 +48,10 @@ const steps = [
     ),
   },
   {
-    number: "02",
-    title: "AI Analyzes Your Needs",
+    number: "04",
+    title: "Get Your AI Roadmap",
     description:
-      "Our AI copilot processes your inputs, identifies opportunities, and maps them against industry best practices and use cases.",
-    icon: (
-      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.5}
-          d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    number: "03",
-    title: "Get Your Roadmap",
-    description:
-      "Receive a prioritized AI opportunity report with specific use cases, risk assessment, and a practical implementation timeline.",
+      "Receive a practical AI opportunity report with prioritized use cases, risk assessment, and implementation steps.",
     icon: (
       <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
@@ -66,12 +82,12 @@ export function HowItWorks() {
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
             Our streamlined process helps you identify the right AI
-            opportunities for your organization in three simple steps.
+            opportunities for your organization in four simple steps.
           </p>
         </div>
 
         {/* Steps grid */}
-        <div className="grid gap-6 md:grid-cols-3 md:gap-8">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           {steps.map((step, index) => (
             <div
               key={step.number}
@@ -83,20 +99,20 @@ export function HowItWorks() {
               )}
 
               {/* Step header */}
-              <div className="mb-8 flex items-start justify-between">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-rose/20 to-rose/5 text-rose ring-1 ring-rose/10 transition-all duration-500 group-hover:ring-rose/20">
+              <div className="mb-6 flex items-start justify-between">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/5 text-rose ring-1 ring-rose/10 transition-all duration-500 group-hover:ring-rose/20">
                   {step.icon}
                 </div>
-                <span className="text-5xl font-bold text-white/[0.04] transition-all duration-500 group-hover:text-rose/10">
+                <span className="text-4xl font-bold text-white/[0.04] transition-all duration-500 group-hover:text-rose/10">
                   {step.number}
                 </span>
               </div>
 
               {/* Step content */}
-              <h3 className="mb-3 text-xl font-semibold tracking-tight text-foreground">
+              <h3 className="mb-2 text-lg font-semibold tracking-tight text-foreground">
                 {step.title}
               </h3>
-              <p className="leading-relaxed text-muted-foreground">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {step.description}
               </p>
             </div>
