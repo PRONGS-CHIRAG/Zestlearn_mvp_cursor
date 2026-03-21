@@ -78,10 +78,10 @@ const audiences = [
 
 export function TargetAudience() {
   return (
-    <section id="audience" className="relative bg-card py-24 md:py-32">
+    <section id="audience" className="relative bg-gradient-to-b from-background via-card to-background py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center">
-          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-coral">
+          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-rose">
             Who It's For
           </span>
           <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
@@ -98,9 +98,9 @@ export function TargetAudience() {
           {audiences.map((audience) => (
             <div
               key={audience.title}
-              className="group flex flex-col rounded-2xl border border-border bg-background p-8 transition-all hover:border-coral/50"
+              className="group flex flex-col rounded-2xl border border-navy/50 bg-gradient-to-b from-card to-background p-8 transition-all hover:border-rose/30 hover:shadow-xl hover:shadow-rose/5"
             >
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-coral/10 to-navy/10 text-coral">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-rose/10 to-navy/10 text-rose">
                 {audience.icon}
               </div>
 
@@ -119,7 +119,7 @@ export function TargetAudience() {
                     className="flex items-center gap-3 text-sm text-muted-foreground"
                   >
                     <svg
-                      className="h-4 w-4 shrink-0 text-coral"
+                      className="h-4 w-4 shrink-0 text-rose"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"

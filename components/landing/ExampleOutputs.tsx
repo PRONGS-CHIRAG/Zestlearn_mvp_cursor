@@ -57,7 +57,7 @@ export function ExampleOutputs() {
     <section id="examples" className="relative py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center">
-          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-coral">
+          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-rose">
             What You Get
           </span>
           <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
@@ -73,16 +73,16 @@ export function ExampleOutputs() {
           {examples.map((example, index) => (
             <div
               key={example.title}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card"
+              className="group relative overflow-hidden rounded-2xl border border-navy/50 bg-gradient-to-b from-card to-background transition-all hover:border-rose/30 hover:shadow-xl hover:shadow-rose/5"
             >
               {/* Preview area */}
-              <div className="border-b border-border bg-background/50 p-6">
+              <div className="border-b border-navy/30 bg-background/50 p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-wider text-coral">
+                  <span className="text-xs font-medium uppercase tracking-wider text-rose">
                     {example.category}
                   </span>
                   <div className="flex gap-1">
-                    <div className="h-2 w-2 rounded-full bg-coral/60" />
+                    <div className="h-2 w-2 rounded-full bg-rose/60" />
                     <div className="h-2 w-2 rounded-full bg-muted" />
                     <div className="h-2 w-2 rounded-full bg-muted" />
                   </div>
@@ -100,7 +100,7 @@ export function ExampleOutputs() {
                           <span
                             className={`h-2 w-2 rounded-full ${
                               item.priority === "High"
-                                ? "bg-coral"
+                                ? "bg-rose"
                                 : "bg-muted-foreground"
                             }`}
                           />
@@ -143,7 +143,7 @@ export function ExampleOutputs() {
                         key={phase.week}
                         className="flex items-center gap-3 rounded-lg bg-secondary/50 px-3 py-2 text-sm"
                       >
-                        <span className="w-12 shrink-0 font-mono text-coral">
+                        <span className="w-12 shrink-0 font-mono text-rose">
                           W{phase.week}
                         </span>
                         <span className="text-foreground">{phase.task}</span>

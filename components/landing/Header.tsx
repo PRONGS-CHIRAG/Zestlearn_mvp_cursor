@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export function Header() {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-navy/30 bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
           <Image
@@ -39,7 +39,7 @@ export function Header() {
         </nav>
         <Link
           href="/assessment"
-          className="rounded-lg bg-coral px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:bg-coral/90 hover:shadow-lg hover:shadow-coral/25"
+          className="rounded-lg bg-gradient-to-r from-rose to-pink-500 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-rose/20 transition-all hover:shadow-lg hover:shadow-rose/30 hover:brightness-110"
         >
           Start Assessment
         </Link>

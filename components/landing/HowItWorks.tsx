@@ -69,7 +69,7 @@ export function HowItWorks() {
     <section id="how-it-works" className="relative py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center">
-          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-coral">
+          <span className="mb-4 inline-block text-sm font-medium uppercase tracking-wider text-rose">
             How It Works
           </span>
           <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
@@ -85,7 +85,7 @@ export function HowItWorks() {
           {steps.map((step, index) => (
             <div
               key={step.number}
-              className="group relative rounded-2xl border border-border bg-card p-8 transition-all hover:border-coral/50 hover:bg-card/80"
+              className="group relative rounded-2xl border border-navy/50 bg-gradient-to-b from-card to-background p-8 transition-all hover:border-rose/30 hover:shadow-xl hover:shadow-rose/5"
             >
               {/* Connection line */}
               {index < steps.length - 1 && (
@@ -93,10 +93,10 @@ export function HowItWorks() {
               )}
 
               <div className="mb-6 flex items-center justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-coral/10 text-coral transition-colors group-hover:bg-coral/20">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose/10 text-rose transition-colors group-hover:bg-rose/20">
                   {step.icon}
                 </div>
-                <span className="text-4xl font-bold text-border transition-colors group-hover:text-coral/30">
+                <span className="text-4xl font-bold text-border transition-colors group-hover:text-rose/30">
                   {step.number}
                 </span>
               </div>

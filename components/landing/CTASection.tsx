@@ -4,10 +4,10 @@ export function CTASection() {
   return (
     <section className="relative py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card to-navy/20 p-8 md:p-16">
+        <div className="relative overflow-hidden rounded-3xl border border-rose/20 bg-gradient-to-br from-navy/30 via-card to-rose/10 p-8 md:p-16">
           {/* Background decorations */}
-          <div className="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-coral/5 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-navy/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-rose/15 blur-[100px]" />
+          <div className="pointer-events-none absolute -bottom-20 -left-20 h-80 w-80 rounded-full bg-navy/40 blur-[80px]" />
 
           <div className="relative z-10 mx-auto max-w-2xl text-center">
             <h2 className="mb-4 text-balance text-3xl font-bold text-foreground md:text-5xl">
@@ -22,7 +22,7 @@ export function CTASection() {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/assessment"
-                className="group flex items-center gap-2 rounded-lg bg-coral px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-coral/90 hover:shadow-xl hover:shadow-coral/25"
+                className="group flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose to-pink-500 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-rose/25 transition-all hover:shadow-xl hover:shadow-rose/40 hover:brightness-110"
               >
                 Start Your AI Assessment
                 <svg

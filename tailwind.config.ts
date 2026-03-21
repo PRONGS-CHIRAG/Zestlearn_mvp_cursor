@@ -37,7 +37,7 @@ const config: Config = {
         border: "var(--border)",
         ring: "var(--ring)",
         navy: "var(--navy)",
-        coral: "var(--coral)",
+        rose: "var(--rose)",
       },
       borderRadius: {
         lg: "var(--radius)",
