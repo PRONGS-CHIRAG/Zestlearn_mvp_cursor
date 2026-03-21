@@ -14,3 +14,4 @@ export interface AIProvider {
 }
 
 export { GeminiProvider } from "./providers/gemini";
+export { FeatherlessProvider } from "./providers/featherless";
