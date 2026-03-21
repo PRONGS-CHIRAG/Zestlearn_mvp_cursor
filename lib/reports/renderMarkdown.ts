@@ -1,64 +1,142 @@
 import type { OpportunityReport } from "@/types/report";
 
-export function renderReportMarkdown(report: OpportunityReport): string {
-  const lines: string[] = [];
+export function renderReportMarkdown(
+  report: OpportunityReport,
+  companyName = "Your Organization"
+): string {
+  const l: string[] = [];
 
-  lines.push(`# AI Opportunity Report`);
-  lines.push(``);
-  lines.push(`## Problem Summary`);
-  lines.push(report.problem_summary);
-  lines.push(``);
+  l.push(`# AI Opportunity Assessment Report`);
+  l.push(``);
+  l.push(`**Prepared for:** ${companyName}`);
+  l.push(`**Generated:** ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`);
+  l.push(``);
+  l.push(`---`);
+  l.push(``);
 
+  // Executive Summary
+  l.push(`## Executive Summary`);
+  l.push(``);
+  l.push(report.executive_summary);
+  l.push(``);
+
+  // Problem Summary
+  l.push(`## Problem Summary`);
+  l.push(``);
+  l.push(report.problem_summary);
+  l.push(``);
+
+  // Pain Points
   if (report.current_pain_points.length > 0) {
-    lines.push(`## Current Pain Points`);
+    l.push(`## Current Pain Points`);
+    l.push(``);
     for (const p of report.current_pain_points) {
-      lines.push(`- ${p}`);
+      l.push(`- ${p}`);
     }
-    lines.push(``);
+    l.push(``);
   }
 
+  // Use Cases
   if (report.recommended_use_cases.length > 0) {
-    lines.push(`## Recommended AI Use Cases`);
-    for (const uc of report.recommended_use_cases) {
-      lines.push(`### ${uc.title} (Priority: ${uc.priority_score}/10 | Difficulty: ${uc.difficulty})`);
-      lines.push(uc.description);
-      lines.push(`**Business value:** ${uc.business_value}`);
+    l.push(`## Recommended AI Use Cases`);
+    l.push(``);
+    for (let i = 0; i < report.recommended_use_cases.length; i++) {
+      const uc = report.recommended_use_cases[i];
+      l.push(`### ${i + 1}. ${uc.title}`);
+      l.push(``);
+      l.push(`| Attribute | Detail |`);
+      l.push(`|-----------|--------|`);
+      l.push(`| **Priority Score** | ${uc.priority_score}/10 |`);
+      l.push(`| **Difficulty** | ${uc.difficulty.charAt(0).toUpperCase() + uc.difficulty.slice(1)} |`);
+      l.push(`| **Business Value** | ${uc.business_value} |`);
+      l.push(``);
+      l.push(uc.description);
+      l.push(``);
       if (uc.data_requirements.length > 0) {
-        lines.push(`**Data requirements:** ${uc.data_requirements.join(", ")}`);
+        l.push(`**Data Requirements:**`);
+        for (const d of uc.data_requirements) l.push(`- ${d}`);
+        l.push(``);
       }
       if (uc.risks.length > 0) {
-        lines.push(`**Risks:** ${uc.risks.join(", ")}`);
+        l.push(`**Risks:**`);
+        for (const r of uc.risks) l.push(`- ${r}`);
+        l.push(``);
       }
-      lines.push(``);
     }
   }
 
-  lines.push(`## Best First Pilot`);
-  lines.push(`**${report.best_first_pilot.title}**`);
-  lines.push(report.best_first_pilot.why_this_first);
+  // Best First Pilot
+  l.push(`## Recommended First Pilot`);
+  l.push(``);
+  l.push(`**${report.best_first_pilot.title}**`);
+  l.push(``);
+  l.push(report.best_first_pilot.why_this_first);
+  l.push(``);
+  if (report.best_first_pilot.estimated_timeline) {
+    l.push(`**Estimated Timeline:** ${report.best_first_pilot.estimated_timeline}`);
+    l.push(``);
+  }
   if (report.best_first_pilot.success_metrics.length > 0) {
-    lines.push(`Success metrics:`);
-    for (const m of report.best_first_pilot.success_metrics) {
-      lines.push(`- ${m}`);
+    l.push(`**Success Metrics:**`);
+    for (const m of report.best_first_pilot.success_metrics) l.push(`- ${m}`);
+    l.push(``);
+  }
+
+  // Business Impact
+  l.push(`## Estimated Business Impact`);
+  l.push(``);
+  l.push(`| Metric | Estimate |`);
+  l.push(`|--------|----------|`);
+  l.push(`| **Efficiency Gains** | ${report.estimated_business_impact.efficiency_gains} |`);
+  l.push(`| **Cost Reduction** | ${report.estimated_business_impact.cost_reduction} |`);
+  l.push(`| **Timeline to Value** | ${report.estimated_business_impact.timeline_to_value} |`);
+  l.push(``);
+  l.push(`> *Note: All estimates are conservative ranges based on the assumptions listed below. Actual results will depend on implementation quality and organizational readiness.*`);
+  l.push(``);
+
+  // Roadmap
+  l.push(`## 30 / 60 / 90 Day Roadmap`);
+  l.push(``);
+  const phases: [string, string[]][] = [
+    ["Days 1-30: Foundation", report.roadmap_30_60_90.days_30],
+    ["Days 31-60: Build", report.roadmap_30_60_90.days_60],
+    ["Days 61-90: Scale", report.roadmap_30_60_90.days_90],
+  ];
+  for (const [heading, items] of phases) {
+    if (items.length > 0) {
+      l.push(`### ${heading}`);
+      for (const item of items) l.push(`- ${item}`);
+      l.push(``);
     }
   }
-  lines.push(``);
 
-  lines.push(`## 30 / 60 / 90 Day Roadmap`);
-  lines.push(`### 30 Days`);
-  for (const item of report.roadmap_30_60_90.days_30) lines.push(`- ${item}`);
-  lines.push(`### 60 Days`);
-  for (const item of report.roadmap_30_60_90.days_60) lines.push(`- ${item}`);
-  lines.push(`### 90 Days`);
-  for (const item of report.roadmap_30_60_90.days_90) lines.push(`- ${item}`);
-  lines.push(``);
+  // Risks
+  if (report.risks_and_constraints.length > 0) {
+    l.push(`## Risks and Constraints`);
+    l.push(``);
+    for (const r of report.risks_and_constraints) l.push(`- ${r}`);
+    l.push(``);
+  }
 
+  // Assumptions
+  if (report.assumptions.length > 0) {
+    l.push(`## Assumptions`);
+    l.push(``);
+    for (const a of report.assumptions) l.push(`- ${a}`);
+    l.push(``);
+  }
+
+  // Open Questions
   if (report.open_questions.length > 0) {
-    lines.push(`## Open Questions`);
-    for (const q of report.open_questions) {
-      lines.push(`- ${q}`);
-    }
+    l.push(`## Open Questions`);
+    l.push(``);
+    for (const q of report.open_questions) l.push(`- ${q}`);
+    l.push(``);
   }
 
-  return lines.join("\n");
+  l.push(`---`);
+  l.push(``);
+  l.push(`*This report was generated by ZestLearn AI and should be reviewed by domain experts before acting on recommendations.*`);
+
+  return l.join("\n");
 }
