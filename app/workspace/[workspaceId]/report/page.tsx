@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import MarkdownReportView from "@/components/report/MarkdownReportView";
+import { downloadReportPdf } from "@/lib/reports/downloadReportPdf";
 
 interface ReportPageProps {
   params: { workspaceId: string };
@@ -13,8 +15,27 @@ interface ReportPageProps {
 export default function ReportPage({ params }: ReportPageProps) {
   const { workspaceId } = params;
   const wsId = workspaceId as Id<"workspaces">;
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const report = useQuery(api.reports.getLatestReportByWorkspace, { workspaceId: wsId });
+
+  const handleDownloadPdf = async () => {
+    setIsDownloadingPdf(true);
+    setDownloadError(null);
+
+    try {
+      await downloadReportPdf(workspaceId);
+    } catch (error) {
+      setDownloadError(
+        error instanceof Error
+          ? error.message
+          : "Unable to download the report PDF."
+      );
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -27,19 +48,41 @@ export default function ReportPage({ params }: ReportPageProps) {
           >
             &larr; Back to workspace
           </Link>
-          {report && (
-            <span className="text-xs text-muted-foreground">
-              Generated{" "}
-              {new Date(report.createdAt).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            {report && (
+              <>
+                <span className="text-xs text-muted-foreground">
+                  Generated{" "}
+                  {new Date(report.createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={isDownloadingPdf}
+                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
+                    isDownloadingPdf
+                      ? "cursor-not-allowed border border-white/10 bg-muted/20 text-muted-foreground"
+                      : "border border-white/10 bg-muted/40 text-foreground hover:bg-muted/60"
+                  }`}
+                >
+                  {isDownloadingPdf ? "Downloading..." : "Download PDF"}
+                </button>
+              </>
+            )}
+          </div>
         </div>
+
+        {downloadError && (
+          <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-400">
+            {downloadError}
+          </div>
+        )}
 
         {/* Loading */}
         {report === undefined && (
