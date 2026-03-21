@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "convex/react";
+import ReactMarkdown from "react-markdown";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { AVAILABLE_MODELS } from "@/lib/ai/models";
@@ -74,46 +75,37 @@ function formatTime(ts: number): string {
   });
 }
 
-// Simple markdown-ish renderer for assistant messages
 function MessageContent({ content, role }: { content: string; role: string }) {
+  if (role === "user") {
+    return <p className="whitespace-pre-wrap text-sm leading-relaxed">{content}</p>;
+  }
+
   return (
     <div
-      className={`prose prose-sm max-w-none ${
-        role === "user"
-          ? "prose-invert"
-          : "prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90"
-      }`}
+      className="prose prose-sm prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90 prose-ul:my-2 prose-ol:my-2 prose-p:my-2"
     >
-      {content.split("\n").map((line, i) => {
-        if (line.startsWith("**") && line.endsWith("**")) {
-          return (
-            <p key={i} className="mb-2 font-semibold">
-              {line.replace(/\*\*/g, "")}
-            </p>
-          );
-        }
-        if (line.startsWith("*") && line.endsWith("*")) {
-          return (
-            <p key={i} className="mb-1 italic text-muted-foreground">
-              {line.replace(/\*/g, "")}
-            </p>
-          );
-        }
-        if (line.startsWith("- ")) {
-          return (
-            <p key={i} className="mb-1 pl-3">
-              <span className="mr-2 text-rose">-</span>
-              {line.substring(2)}
-            </p>
-          );
-        }
-        if (line === "") return <br key={i} />;
-        return (
-          <p key={i} className="mb-2">
-            {line}
-          </p>
-        );
-      })}
+      <ReactMarkdown
+        components={{
+          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+          ul: ({ children }) => <ul className="mb-2 list-disc pl-5">{children}</ul>,
+          ol: ({ children }) => <ol className="mb-2 list-decimal pl-5">{children}</ol>,
+          li: ({ children }) => <li className="mb-1 marker:text-rose">{children}</li>,
+          strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+          em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
+          a: ({ children, href }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              className="text-rose underline underline-offset-2"
+            >
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 }
