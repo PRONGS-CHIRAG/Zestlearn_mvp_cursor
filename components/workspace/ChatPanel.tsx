@@ -354,33 +354,35 @@ export default function ChatPanel({ workspaceId }: Props) {
       )}
 
       {/* Input area */}
-      <div className="mt-4">
-        {/* Model selector */}
-        <div className="mb-3 flex items-center gap-3">
-          <label className="text-xs font-medium text-muted-foreground">Model:</label>
-          <select
-            value={selectedModelId}
-            onChange={(e) => setSelectedModelId(e.target.value)}
-            className="rounded-lg border border-white/10 bg-card/50 px-3 py-1.5 text-xs text-foreground outline-none transition-colors focus:border-rose/50 focus:ring-1 focus:ring-rose/20"
-          >
-            {AVAILABLE_MODELS.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.label} — {m.description}
-              </option>
-            ))}
-          </select>
-        </div>
-
+      <div className="mt-4 space-y-2">
         <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-card/50 p-2 transition-all focus-within:border-rose/50 focus-within:ring-2 focus-within:ring-rose/20">
+          {/* Compact model selector inside the input bar */}
+          <div className="flex items-center gap-1.5 border-r border-white/10 pr-2">
+            <svg className="h-4 w-4 flex-shrink-0 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+            <select
+              value={selectedModelId}
+              onChange={(e) => setSelectedModelId(e.target.value)}
+              className="w-36 cursor-pointer appearance-none rounded-md border border-white/15 bg-muted/40 px-2 py-1.5 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-rose/40 focus:border-rose/50"
+            >
+              {AVAILABLE_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about AI opportunities for your team..."
+            placeholder="Ask about AI opportunities..."
             disabled={isLoading}
-            className="flex-1 bg-transparent px-3 py-2 text-sm text-foreground placeholder-muted-foreground outline-none disabled:opacity-50"
+            className="flex-1 bg-transparent px-2 py-2 text-sm text-foreground placeholder-muted-foreground outline-none disabled:opacity-50"
           />
           <button
             onClick={() => handleSend()}
@@ -399,12 +401,12 @@ export default function ChatPanel({ workspaceId }: Props) {
             )}
           </button>
         </div>
-        <div className="mt-3 flex items-center justify-between px-1">
+        <div className="flex items-center justify-between px-1">
           <p className="text-xs text-muted-foreground">
-            Press Enter to send
+            Enter to send
           </p>
           <p className="text-xs text-muted-foreground">
-            AI responses are validated before display
+            Responses validated before display
           </p>
         </div>
       </div>
