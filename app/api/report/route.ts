@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
-import { GeminiProvider } from "@/lib/ai/providers/gemini";
+import { OpenAIProvider } from "@/lib/ai/providers/openai";
 import { generateReport } from "@/lib/reports/generateReport";
 import { renderReportMarkdown } from "@/lib/reports/renderMarkdown";
 import { extractInsightsFromReport } from "@/lib/reports/extractInsights";
@@ -80,15 +80,18 @@ export async function POST(req: NextRequest) {
     });
 
     // Generate structured report via AI
-    const geminiKey = process.env.GEMINI_API_KEY;
-    if (!geminiKey) {
+    const openAiKey = process.env.OPENAI_API_KEY;
+    if (!openAiKey) {
       return NextResponse.json(
-        { success: false, error: "GEMINI_API_KEY is not configured on the server" },
+        {
+          success: false,
+          error: "OPENAI_API_KEY is not configured on the server",
+        },
         { status: 500 }
       );
     }
 
-    const provider = new GeminiProvider(geminiKey);
+    const provider = new OpenAIProvider(openAiKey, "gpt-4o-mini");
     const structuredReport = await generateReport(reportContext, provider);
 
     // Render deterministic markdown from structured JSON
@@ -136,7 +139,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Report generation failed",
+        error:
+          error instanceof Error
+            ? error.message
+            : "OpenAI report generation failed",
       },
       { status: 500 }
     );
