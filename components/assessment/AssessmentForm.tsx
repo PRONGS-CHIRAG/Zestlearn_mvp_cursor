@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type {
   AssessmentInput,
   AssessmentValidationErrors,
+  AssessmentSubmitResponse,
 } from "@/types/assessment";
 import CompanyDetailsStep from "./CompanyDetailsStep";
 import BottleneckStep from "./BottleneckStep";
@@ -23,12 +24,32 @@ const initialState: AssessmentInput = {
   dataAvailability: "",
 };
 
-export default function AssessmentForm() {
+// Mock submit function - replace with actual API call
+async function submitAssessment(
+  data: AssessmentInput
+): Promise<AssessmentSubmitResponse> {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
+  // Mock success response with workspace ID
+  return {
+    success: true,
+    workspaceId: `ws_${Date.now()}`,
+    assessmentId: `asmt_${Date.now()}`,
+  };
+}
+
+interface Props {
+  onSubmit?: (data: AssessmentInput) => Promise<AssessmentSubmitResponse>;
+}
+
+export default function AssessmentForm({ onSubmit }: Props) {
   const router = useRouter();
   const [form, setForm] = useState<AssessmentInput>(initialState);
   const [errors, setErrors] = useState<AssessmentValidationErrors>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   function handleChange(
     e: React.ChangeEvent<
@@ -40,53 +61,196 @@ export default function AssessmentForm() {
       ...prev,
       [name]: name === "aiMaturity" ? Number(value) : value,
     }));
-    setErrors((prev) => ({ ...prev, [name]: undefined }));
+    // Clear error when user types
+    if (errors[name as keyof AssessmentValidationErrors]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  }
+
+  function handleBlur(e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    // Validate single field on blur
+    validateField(name as keyof AssessmentInput);
+  }
+
+  function validateField(fieldName: keyof AssessmentInput): string | undefined {
+    const value = form[fieldName];
+    let error: string | undefined;
+
+    switch (fieldName) {
+      case "companyName":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Company name is required";
+        } else if (typeof value === "string" && value.length < 2) {
+          error = "Company name must be at least 2 characters";
+        }
+        break;
+      case "companyType":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Please select a company type";
+        }
+        break;
+      case "companySize":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Please select a company size";
+        }
+        break;
+      case "department":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Department is required";
+        }
+        break;
+      case "role":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Your role is required";
+        }
+        break;
+      case "bottleneck":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Please describe your main bottleneck";
+        } else if (typeof value === "string" && value.length < 20) {
+          error = "Please provide more detail (at least 20 characters)";
+        }
+        break;
+      case "desiredOutcome":
+        if (!value || (typeof value === "string" && !value.trim())) {
+          error = "Please describe your desired outcome";
+        } else if (typeof value === "string" && value.length < 10) {
+          error = "Please provide more detail (at least 10 characters)";
+        }
+        break;
+      case "aiMaturity":
+        if (typeof value === "number" && (value < 1 || value > 5)) {
+          error = "AI maturity must be between 1 and 5";
+        }
+        break;
+    }
+
+    if (error) {
+      setErrors((prev) => ({ ...prev, [fieldName]: error }));
+    }
+    return error;
   }
 
   function validate(): boolean {
     const newErrors: AssessmentValidationErrors = {};
-    if (!form.companyName.trim()) newErrors.companyName = "Required";
-    if (!form.companyType.trim()) newErrors.companyType = "Required";
-    if (!form.companySize.trim()) newErrors.companySize = "Required";
-    if (!form.department.trim()) newErrors.department = "Required";
-    if (!form.role.trim()) newErrors.role = "Required";
-    if (!form.bottleneck.trim()) newErrors.bottleneck = "Required";
-    if (!form.desiredOutcome.trim()) newErrors.desiredOutcome = "Required";
-    if (!form.aiMaturity || form.aiMaturity < 1 || form.aiMaturity > 5)
-      newErrors.aiMaturity = "Must be between 1 and 5";
+
+    // Required fields
+    if (!form.companyName.trim()) {
+      newErrors.companyName = "Company name is required";
+    } else if (form.companyName.length < 2) {
+      newErrors.companyName = "Company name must be at least 2 characters";
+    }
+
+    if (!form.companyType.trim()) {
+      newErrors.companyType = "Please select a company type";
+    }
+
+    if (!form.companySize.trim()) {
+      newErrors.companySize = "Please select a company size";
+    }
+
+    if (!form.department.trim()) {
+      newErrors.department = "Department is required";
+    }
+
+    if (!form.role.trim()) {
+      newErrors.role = "Your role is required";
+    }
+
+    if (!form.bottleneck.trim()) {
+      newErrors.bottleneck = "Please describe your main bottleneck";
+    } else if (form.bottleneck.length < 20) {
+      newErrors.bottleneck = "Please provide more detail (at least 20 characters)";
+    }
+
+    if (!form.desiredOutcome.trim()) {
+      newErrors.desiredOutcome = "Please describe your desired outcome";
+    } else if (form.desiredOutcome.length < 10) {
+      newErrors.desiredOutcome = "Please provide more detail (at least 10 characters)";
+    }
+
+    if (!form.aiMaturity || form.aiMaturity < 1 || form.aiMaturity > 5) {
+      newErrors.aiMaturity = "AI maturity must be between 1 and 5";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validate()) return;
+
+    if (!validate()) {
+      // Scroll to first error
+      const firstErrorField = document.querySelector("[data-error='true']");
+      firstErrorField?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     setLoading(true);
     setServerError(null);
+
     try {
-      // TODO: replace with real Convex mutation call
-      // const result = await submitAssessment(form);
-      // router.push(`/workspace/${result.workspaceId}`);
-      console.log("Assessment payload:", form);
-    } catch {
-      setServerError("Submission failed. Please try again.");
+      const submitFn = onSubmit || submitAssessment;
+      const result = await submitFn(form);
+
+      if (result.success && result.workspaceId) {
+        router.push(`/workspace/${result.workspaceId}`);
+      } else {
+        setServerError(result.error || "Submission failed. Please try again.");
+      }
+    } catch (err) {
+      setServerError(
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   }
 
+  const completedFields = [
+    form.companyName,
+    form.companyType,
+    form.companySize,
+    form.department,
+    form.role,
+    form.bottleneck,
+    form.desiredOutcome,
+  ].filter((f) => f && f.trim().length > 0).length;
+
+  const totalRequiredFields = 7;
+  const progressPercent = Math.round((completedFields / totalRequiredFields) * 100);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8 p-6 md:p-8">
+      {/* Progress bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Form completion</span>
+          <span className="font-medium text-foreground">{progressPercent}%</span>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-rose to-pink-500 transition-all duration-500 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+      </div>
+
       {/* Company Details */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose/10 text-rose">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
             <svg
-              className="h-4 w-4"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth={2}
+              strokeWidth={1.5}
             >
               <path
                 strokeLinecap="round"
@@ -104,21 +268,26 @@ export default function AssessmentForm() {
             </p>
           </div>
         </div>
-        <CompanyDetailsStep form={form} errors={errors} onChange={handleChange} />
+        <CompanyDetailsStep
+          form={form}
+          errors={errors}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
       </div>
 
-      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* Bottleneck */}
+      {/* Bottleneck & Goals */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose/10 text-rose">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
             <svg
-              className="h-4 w-4"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth={2}
+              strokeWidth={1.5}
             >
               <path
                 strokeLinecap="round"
@@ -136,21 +305,26 @@ export default function AssessmentForm() {
             </p>
           </div>
         </div>
-        <BottleneckStep form={form} errors={errors} onChange={handleChange} />
+        <BottleneckStep
+          form={form}
+          errors={errors}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
       </div>
 
-      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
       {/* AI Maturity */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose/10 text-rose">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
             <svg
-              className="h-4 w-4"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth={2}
+              strokeWidth={1.5}
             >
               <path
                 strokeLinecap="round"
@@ -171,30 +345,38 @@ export default function AssessmentForm() {
         <AIMaturityStep form={form} errors={errors} onChange={handleChange} />
       </div>
 
+      {/* Server error */}
       {serverError && (
-        <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-          <div className="flex items-center gap-2">
-            <svg
-              className="h-4 w-4"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {serverError}
+        <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3">
+          <svg
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-red-400">
+              Submission failed
+            </p>
+            <p className="mt-0.5 text-sm text-red-400/80">{serverError}</p>
           </div>
         </div>
       )}
 
+      {/* Submit button */}
       <button
         type="submit"
         disabled={loading}
-        className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose to-pink-500 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-rose/20 transition-all duration-300 hover:shadow-xl hover:shadow-rose/30 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+        className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-rose to-pink-500 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-rose/25 transition-all duration-300 hover:shadow-xl hover:shadow-rose/30 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
+        {/* Button glow effect */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
         {loading ? (
           <>
             <svg
@@ -216,11 +398,11 @@ export default function AssessmentForm() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            Processing...
+            <span>Creating your workspace...</span>
           </>
         ) : (
           <>
-            Create My Workspace
+            <span>Create My Workspace</span>
             <svg
               className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
               fill="none"
@@ -237,6 +419,18 @@ export default function AssessmentForm() {
           </>
         )}
       </button>
+
+      {/* Helper text */}
+      <p className="text-center text-xs text-muted-foreground">
+        By submitting, you agree to our{" "}
+        <a href="/terms" className="text-rose hover:underline">
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="/privacy" className="text-rose hover:underline">
+          Privacy Policy
+        </a>
+      </p>
     </form>
   );
 }

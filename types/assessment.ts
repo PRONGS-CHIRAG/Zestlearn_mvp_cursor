@@ -20,6 +20,8 @@ export interface AssessmentValidationErrors {
   aiMaturity?: string;
   bottleneck?: string;
   desiredOutcome?: string;
+  currentTools?: string;
+  dataAvailability?: string;
 }
 
 export interface AssessmentSubmitResponse {
