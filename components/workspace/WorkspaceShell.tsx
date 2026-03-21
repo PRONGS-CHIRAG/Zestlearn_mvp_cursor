@@ -8,6 +8,8 @@ import DocumentsPanel from "./DocumentsPanel";
 import ChatPanel from "./ChatPanel";
 import ReportsPanel from "./ReportsPanel";
 import InsightsPanel from "./InsightsPanel";
+import PanelErrorBoundary from "@/components/shared/PanelErrorBoundary";
+import { useWorkspace } from "@/hooks/useWorkspace";
 
 const TABS = [
   {
@@ -64,27 +66,18 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]["id"];
 
-interface WorkspaceData {
-  id: string;
-  companyName: string;
-  createdAt: string;
-  status: "active" | "completed" | "archived";
-  assessment?: {
-    companyType?: string;
-    department?: string;
-    bottleneck?: string;
-  };
-}
-
 interface Props {
   workspaceId: string;
-  initialData?: WorkspaceData;
 }
 
-export default function WorkspaceShell({ workspaceId, initialData }: Props) {
+export default function WorkspaceShell({ workspaceId }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const { workspace, loading } = useWorkspace(workspaceId);
+
+  const companyName = workspace?.companyName ?? "Workspace";
+  const departmentLabel = workspace?.department ?? "AI Assessment";
   const statusColors = {
     active: "border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
     completed: "border-blue-500/30 bg-blue-500/10 text-blue-400",
@@ -100,7 +93,6 @@ export default function WorkspaceShell({ workspaceId, initialData }: Props) {
       {/* Header */}
       <header className="relative z-20 border-b border-white/[0.06] bg-background/70 backdrop-blur-2xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Back button and Logo */}
           <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/"
@@ -127,30 +119,23 @@ export default function WorkspaceShell({ workspaceId, initialData }: Props) {
               </span>
             </Link>
 
-            {/* Breadcrumb separator */}
             <div className="hidden h-6 w-px bg-white/10 sm:block" />
 
-            {/* Workspace info */}
             <div className="hidden items-center gap-3 sm:flex">
               <div className="flex flex-col">
                 <span className="text-sm font-medium leading-tight text-foreground">
-                  {initialData?.companyName || "Workspace"}
+                  {loading ? "Loading…" : companyName}
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  {initialData?.assessment?.department || "AI Assessment"}
-                </span>
+                <span className="text-xs text-muted-foreground">{departmentLabel}</span>
               </div>
               <span
-                className={`rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${
-                  statusColors[initialData?.status || "active"]
-                }`}
+                className={`rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${statusColors.active}`}
               >
-                {initialData?.status || "Active"}
+                Active
               </span>
             </div>
           </div>
 
-          {/* Desktop actions */}
           <div className="hidden items-center gap-3 md:flex">
             <button className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.02] px-3.5 py-2 text-sm font-medium text-muted-foreground transition-all hover:border-white/15 hover:bg-white/[0.05] hover:text-foreground">
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -176,7 +161,6 @@ export default function WorkspaceShell({ workspaceId, initialData }: Props) {
             </button>
           </div>
 
-          {/* Mobile menu button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="flex items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] p-2 text-muted-foreground transition-all hover:bg-white/[0.05] hover:text-foreground md:hidden"
@@ -191,80 +175,52 @@ export default function WorkspaceShell({ workspaceId, initialData }: Props) {
           </button>
         </div>
 
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
           <div className="border-t border-white/[0.06] bg-card/95 backdrop-blur-xl md:hidden">
             <div className="space-y-1 px-4 py-3">
               <div className="mb-3 flex items-center gap-2 border-b border-white/[0.06] pb-3">
-                <span className="text-sm font-medium text-foreground">
-                  {initialData?.companyName || "Workspace"}
-                </span>
-                <span
-                  className={`rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${
-                    statusColors[initialData?.status || "active"]
-                  }`}
-                >
-                  {initialData?.status || "Active"}
+                <span className="text-sm font-medium text-foreground">{companyName}</span>
+                <span className={`rounded-full border px-2 py-0.5 text-xs font-medium capitalize ${statusColors.active}`}>
+                  Active
                 </span>
               </div>
               <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/[0.05] hover:text-foreground">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
                 Settings
               </button>
               <Link
                 href={`/workspace/${workspaceId}/report`}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
                 Export Report
               </Link>
-              <button className="flex w-full items-center gap-2 rounded-lg bg-gradient-to-r from-rose to-pink-500 px-3 py-2 text-sm font-semibold text-white">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-                Upload Files
-              </button>
             </div>
           </div>
         )}
       </header>
 
-      {/* Tab navigation */}
       <nav className="relative z-10 border-b border-white/[0.06] bg-card/40 backdrop-blur-lg">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="-mb-px flex gap-1 overflow-x-auto scrollbar-none">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`group relative flex items-center gap-2.5 whitespace-nowrap px-4 py-4 text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? "text-rose"
-                    : "text-muted-foreground hover:text-foreground"
+                  activeTab === tab.id ? "text-rose" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span
                   className={`transition-colors ${
-                    activeTab === tab.id
-                      ? "text-rose"
-                      : "text-muted-foreground group-hover:text-foreground"
+                    activeTab === tab.id ? "text-rose" : "text-muted-foreground group-hover:text-foreground"
                   }`}
                 >
                   {tab.icon}
                 </span>
                 <span>{tab.label}</span>
-
-                {/* Active indicator */}
                 {activeTab === tab.id && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full bg-gradient-to-r from-rose to-pink-500" />
                 )}
-
-                {/* Hover indicator */}
                 {activeTab !== tab.id && (
                   <span className="absolute bottom-0 left-0 right-0 h-0.5 scale-x-0 rounded-t-full bg-white/20 transition-transform group-hover:scale-x-100" />
                 )}
@@ -274,31 +230,23 @@ export default function WorkspaceShell({ workspaceId, initialData }: Props) {
         </div>
       </nav>
 
-      {/* Panel content */}
       <main className="relative z-10 flex-1">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {activeTab === "overview" && (
-              <OverviewPanel workspaceId={workspaceId} initialData={initialData} />
-            )}
-            {activeTab === "documents" && (
-              <DocumentsPanel workspaceId={workspaceId} />
-            )}
-            {activeTab === "chat" && <ChatPanel workspaceId={workspaceId} />}
-            {activeTab === "reports" && <ReportsPanel workspaceId={workspaceId} />}
-            {activeTab === "insights" && (
-              <InsightsPanel workspaceId={workspaceId} />
-            )}
+            <PanelErrorBoundary>
+              {activeTab === "overview" && <OverviewPanel workspaceId={workspaceId} />}
+              {activeTab === "documents" && <DocumentsPanel workspaceId={workspaceId} />}
+              {activeTab === "chat" && <ChatPanel workspaceId={workspaceId} />}
+              {activeTab === "reports" && <ReportsPanel workspaceId={workspaceId} />}
+              {activeTab === "insights" && <InsightsPanel workspaceId={workspaceId} />}
+            </PanelErrorBoundary>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="relative z-10 border-t border-white/[0.06] bg-card/30 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} ZestLearn. All rights reserved.
-          </p>
+          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} ZestLearn. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/help" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
               Help
