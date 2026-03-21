@@ -28,17 +28,17 @@ export function Hero() {
 
         {/* Headline */}
         <h1 className="mb-8 text-balance text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
-          Find Your Next AI Pilot in{" "}
+          Find the best AI pilot for your{" "}
           <span className="bg-gradient-to-r from-rose via-pink-400 to-rose-light bg-clip-text text-transparent">
-            Minutes, Not Months
+            pharma or biotech team
           </span>
         </h1>
 
         {/* Subheadline */}
         <p className="mx-auto mb-12 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          ZestLearn is your AI consultant copilot for pharma and biotech SMEs.
-          We analyze your business context and generate a practical AI
-          opportunity roadmap tailored to your team.
+          ZestLearn analyzes your business context, documents, and pain points
+          to recommend practical AI use cases and a clear implementation
+          roadmap tailored specifically for your organization.
         </p>
 
         {/* CTA Buttons */}
