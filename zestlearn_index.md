@@ -226,6 +226,28 @@ Best for:
 
 ---
 
+## 11. `structuring_per_coder`
+
+**Purpose:** Two-coder parallel execution and git collaboration guide.
+
+Use this file to understand:
+
+* how to split work between two people,
+* which files each coder should own,
+* how to work asynchronously in parallel,
+* how to set up git branches and integration flow,
+* when to merge work together,
+* how to follow the 24-hour build plan as a two-person team.
+
+Best for:
+
+* running ZestLearn with two builders instead of one,
+* reducing merge conflicts,
+* keeping frontend and backend work parallelized,
+* coordinating milestone-based integration into a shared branch.
+
+---
+
 ## Shared Memory Workflow
 
 If you are using both Codex and Cursor together, use these four files as the shared context layer:
@@ -274,9 +296,10 @@ These four files create a repo-level memory layer so:
 5. Build with `zestlearn_master_cursor_prompt_pack`
 6. Track progress using `zestlearn_hackathon_build_checklist`
 7. Use `CURRENT_PLAN`, `IMPLEMENTATION_STATUS`, `DECISIONS`, and `NEXT_TASK` as the shared memory layer between Codex and Cursor
+8. Use `structuring_per_coder` when two people are building the MVP in parallel and need a clear ownership and git-integration model
 
 ---
 
 ## One-Line Summary
 
-These documents together define what ZestLearn is, how the MVP should work, how the system should be built, how to execute the build quickly in Cursor, and how to maintain shared planning/implementation memory between Codex and Cursor.
+These documents together define what ZestLearn is, how the MVP should work, how the system should be built, how to execute the build quickly in Cursor, how to maintain shared planning/implementation memory between Codex and Cursor, and how two coders can build the MVP in parallel without losing coordination.
