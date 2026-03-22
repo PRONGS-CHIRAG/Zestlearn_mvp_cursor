@@ -410,14 +410,14 @@ export default function ChatPanel({ workspaceId }: Props) {
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
             <span className="text-xs font-medium text-emerald-400">Online</span>
           </div>
-          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-card/40 px-3 py-2">
-            <label className="text-[11px] font-medium text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-rose/20 bg-rose/5 px-3 py-2">
+            <label className="text-[11px] font-medium text-rose/70">
               Voice
             </label>
             <select
               value={selectedVoiceId}
               onChange={(e) => setSelectedVoiceId(e.target.value)}
-              className="rounded-md border border-white/10 bg-muted/40 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/30 focus:border-rose/50"
+              className="rounded-md border border-rose/20 bg-rose/10 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/40 hover:bg-rose/15 focus:border-rose/60"
             >
               {AVAILABLE_ELEVENLABS_VOICES.map((voice) => (
                 <option key={voice.id} value={voice.id}>
@@ -425,13 +425,13 @@ export default function ChatPanel({ workspaceId }: Props) {
                 </option>
               ))}
             </select>
-            <label className="text-[11px] font-medium text-muted-foreground">
+            <label className="text-[11px] font-medium text-rose/70">
               Speed
             </label>
             <select
               value={playbackRate}
               onChange={(e) => setPlaybackRate(Number(e.target.value))}
-              className="rounded-md border border-white/10 bg-muted/40 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/30 focus:border-rose/50"
+              className="rounded-md border border-rose/20 bg-rose/10 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/40 hover:bg-rose/15 focus:border-rose/60"
             >
               {PLAYBACK_RATE_OPTIONS.map((rate) => (
                 <option key={rate} value={rate}>
@@ -444,15 +444,15 @@ export default function ChatPanel({ workspaceId }: Props) {
               onClick={() => setAutoPlayVoice((prev) => !prev)}
               className={`inline-flex items-center gap-2 rounded-md border px-2 py-1 text-[11px] transition-colors ${
                 autoPlayVoice
-                  ? "border-rose/30 bg-rose/10 text-rose"
-                  : "border-white/10 bg-white/5 text-muted-foreground hover:border-rose/30 hover:text-foreground"
+                  ? "border-rose/40 bg-rose/20 text-rose"
+                  : "border-rose/20 bg-rose/10 text-rose/60 hover:border-rose/40 hover:bg-rose/15 hover:text-rose/80"
               }`}
               aria-pressed={autoPlayVoice}
               title="Auto-play assistant voice"
             >
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  autoPlayVoice ? "bg-rose" : "bg-muted-foreground"
+                  autoPlayVoice ? "bg-rose" : "bg-rose/40"
                 }`}
               />
               Auto-play
