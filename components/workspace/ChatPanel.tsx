@@ -6,6 +6,11 @@ import ReactMarkdown from "react-markdown";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { AVAILABLE_MODELS } from "@/lib/ai/models";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
+import {
+  AVAILABLE_ELEVENLABS_VOICES,
+  DEFAULT_VOICE_ID,
+} from "@/lib/voice/elevenlabs";
 
 interface Props {
   workspaceId: string;
@@ -68,6 +73,9 @@ const PROMPT_STARTERS = [
   },
 ];
 
+const VOICE_SETTINGS_STORAGE_KEY = "zestlearn-chat-voice-settings";
+const PLAYBACK_RATE_OPTIONS = [0.85, 1, 1.15, 1.3] as const;
+
 function formatTime(ts: number): string {
   return new Date(ts).toLocaleTimeString([], {
     hour: "2-digit",
@@ -116,8 +124,17 @@ export default function ChatPanel({ workspaceId }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [typingIndicator, setTypingIndicator] = useState(false);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [loadingVoiceMessageId, setLoadingVoiceMessageId] = useState<string | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [selectedVoiceId, setSelectedVoiceId] = useState(DEFAULT_VOICE_ID);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [autoPlayVoice, setAutoPlayVoice] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const lastAutoPlayedMessageIdRef = useRef<string | null>(null);
 
   // Real messages from Convex
   const convexMessages = useQuery(api.chat.listRecentMessagesByWorkspace, {
@@ -126,13 +143,102 @@ export default function ChatPanel({ workspaceId }: Props) {
   });
   const messages = convexMessages ?? [];
 
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+
+    setPlayingMessageId(null);
+    setLoadingVoiceMessageId(null);
+  }, []);
+
+  const {
+    isSupported: voiceInputSupported,
+    isListening,
+    error: voiceInputError,
+    startListening,
+    stopListening,
+  } = useVoiceInput({
+    onTranscript: (text) => {
+      setInputValue((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+      inputRef.current?.focus();
+    },
+  });
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
+    try {
+      const rawSettings = window.localStorage.getItem(
+        VOICE_SETTINGS_STORAGE_KEY
+      );
+      if (!rawSettings) return;
+
+      const parsed = JSON.parse(rawSettings) as {
+        selectedVoiceId?: string;
+        playbackRate?: number;
+        autoPlayVoice?: boolean;
+      };
+
+      if (
+        parsed.selectedVoiceId &&
+        AVAILABLE_ELEVENLABS_VOICES.some(
+          (voice) => voice.id === parsed.selectedVoiceId
+        )
+      ) {
+        setSelectedVoiceId(parsed.selectedVoiceId);
+      }
+
+      if (
+        typeof parsed.playbackRate === "number" &&
+        PLAYBACK_RATE_OPTIONS.includes(
+          parsed.playbackRate as (typeof PLAYBACK_RATE_OPTIONS)[number]
+        )
+      ) {
+        setPlaybackRate(parsed.playbackRate);
+      }
+
+      if (typeof parsed.autoPlayVoice === "boolean") {
+        setAutoPlayVoice(parsed.autoPlayVoice);
+      }
+    } catch {
+      // Ignore malformed persisted preferences and fall back to defaults.
+    }
+  }, []);
+
+  useEffect(() => {
     scrollToBottom();
   }, [messages, typingIndicator, scrollToBottom]);
+
+  useEffect(() => {
+    return () => {
+      stopAudio();
+    };
+  }, [stopAudio]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        VOICE_SETTINGS_STORAGE_KEY,
+        JSON.stringify({
+          selectedVoiceId,
+          playbackRate,
+          autoPlayVoice,
+        })
+      );
+    } catch {
+      // Ignore storage failures; voice settings will just stay session-only.
+    }
+  }, [selectedVoiceId, playbackRate, autoPlayVoice]);
 
   const handleSend = async (messageText?: string) => {
     const text = messageText || inputValue.trim();
@@ -172,6 +278,103 @@ export default function ChatPanel({ workspaceId }: Props) {
     }
   };
 
+  const handlePlayVoice = useCallback(async (
+    messageId: string,
+    content: string,
+    options?: { voiceId?: string; playbackRate?: number }
+  ) => {
+    setVoiceError(null);
+
+    if (playingMessageId === messageId) {
+      stopAudio();
+      return;
+    }
+
+    stopAudio();
+    setLoadingVoiceMessageId(messageId);
+
+    try {
+      const res = await fetch("/api/chat/voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workspaceId,
+          text: content,
+          voiceId: options?.voiceId ?? selectedVoiceId,
+        }),
+      });
+
+      if (!res.ok) {
+        const json = (await res.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(json?.error || "Failed to generate voice playback.");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+
+      audioUrlRef.current = url;
+      audioRef.current = audio;
+      audio.playbackRate = options?.playbackRate ?? playbackRate;
+      setPlayingMessageId(messageId);
+      setLoadingVoiceMessageId(null);
+
+      audio.onended = () => {
+        stopAudio();
+      };
+
+      audio.onerror = () => {
+        setVoiceError("Voice playback failed.");
+        stopAudio();
+      };
+
+      await audio.play();
+    } catch (err) {
+      setLoadingVoiceMessageId(null);
+      setPlayingMessageId(null);
+      setVoiceError(
+        err instanceof Error ? err.message : "Voice playback failed."
+      );
+    }
+  }, [playbackRate, selectedVoiceId, stopAudio, workspaceId]);
+
+  const handleVoiceInput = () => {
+    if (!voiceInputSupported) return;
+    setVoiceError(null);
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    startListening();
+  };
+
+  useEffect(() => {
+    if (!autoPlayVoice || !messages.length || isLoading || typingIndicator) return;
+
+    const latestAssistantMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.role === "assistant");
+
+    if (!latestAssistantMessage) return;
+    if (latestAssistantMessage._id === lastAutoPlayedMessageIdRef.current) return;
+
+    lastAutoPlayedMessageIdRef.current = latestAssistantMessage._id;
+    void handlePlayVoice(latestAssistantMessage._id, latestAssistantMessage.content, {
+      voiceId: selectedVoiceId,
+      playbackRate,
+    });
+  }, [
+    autoPlayVoice,
+    handlePlayVoice,
+    messages,
+    isLoading,
+    typingIndicator,
+    selectedVoiceId,
+    playbackRate,
+  ]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -184,7 +387,7 @@ export default function ChatPanel({ workspaceId }: Props) {
   return (
     <div className="flex h-[calc(100vh-220px)] flex-col">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-rose/20 bg-gradient-to-br from-rose/20 to-pink-500/10">
             <svg className="h-6 w-6 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -198,9 +401,59 @@ export default function ChatPanel({ workspaceId }: Props) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-          <span className="text-xs font-medium text-emerald-400">Online</span>
+        <div className="flex flex-col gap-3 lg:items-end">
+          <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+            <span className="text-xs font-medium text-emerald-400">Online</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-card/40 px-3 py-2">
+            <label className="text-[11px] font-medium text-muted-foreground">
+              Voice
+            </label>
+            <select
+              value={selectedVoiceId}
+              onChange={(e) => setSelectedVoiceId(e.target.value)}
+              className="rounded-md border border-white/10 bg-muted/40 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/30 focus:border-rose/50"
+            >
+              {AVAILABLE_ELEVENLABS_VOICES.map((voice) => (
+                <option key={voice.id} value={voice.id}>
+                  {voice.label}
+                </option>
+              ))}
+            </select>
+            <label className="text-[11px] font-medium text-muted-foreground">
+              Speed
+            </label>
+            <select
+              value={playbackRate}
+              onChange={(e) => setPlaybackRate(Number(e.target.value))}
+              className="rounded-md border border-white/10 bg-muted/40 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/30 focus:border-rose/50"
+            >
+              {PLAYBACK_RATE_OPTIONS.map((rate) => (
+                <option key={rate} value={rate}>
+                  {rate}x
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setAutoPlayVoice((prev) => !prev)}
+              className={`inline-flex items-center gap-2 rounded-md border px-2 py-1 text-[11px] transition-colors ${
+                autoPlayVoice
+                  ? "border-rose/30 bg-rose/10 text-rose"
+                  : "border-white/10 bg-white/5 text-muted-foreground hover:border-rose/30 hover:text-foreground"
+              }`}
+              aria-pressed={autoPlayVoice}
+              title="Auto-play assistant voice"
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  autoPlayVoice ? "bg-rose" : "bg-muted-foreground"
+                }`}
+              />
+              Auto-play
+            </button>
+          </div>
         </div>
       </div>
 
@@ -297,6 +550,42 @@ export default function ChatPanel({ workspaceId }: Props) {
                           msg.role === "user" ? "justify-end" : "justify-start"
                         }`}
                       >
+                        {msg.role === "assistant" && (
+                          <button
+                            type="button"
+                            onClick={() => handlePlayVoice(msg._id, msg.content)}
+                            disabled={loadingVoiceMessageId === msg._id}
+                            className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 py-0.5 transition-colors hover:border-rose/30 hover:text-foreground disabled:opacity-60"
+                            aria-label={
+                              playingMessageId === msg._id
+                                ? "Stop voice playback"
+                                : "Listen to response"
+                            }
+                            title={
+                              playingMessageId === msg._id
+                                ? "Stop voice playback"
+                                : "Listen to response"
+                            }
+                          >
+                            {loadingVoiceMessageId === msg._id ? (
+                              <svg className="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                              </svg>
+                            ) : playingMessageId === msg._id ? (
+                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5.75 4A1.75 1.75 0 004 5.75v8.5C4 15.216 4.784 16 5.75 16h.5c.966 0 1.75-.784 1.75-1.75v-8.5C8 4.784 7.216 4 6.25 4h-.5zm8 0A1.75 1.75 0 0012 5.75v8.5c0 .966.784 1.75 1.75 1.75h.5c.966 0 1.75-.784 1.75-1.75v-8.5A1.75 1.75 0 0014.25 4h-.5z" />
+                              </svg>
+                            ) : (
+                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M6.3 4.84A1 1 0 005 5.73v8.54a1 1 0 001.52.857l6.79-4.27a1 1 0 000-1.694L6.3 4.84z" />
+                              </svg>
+                            )}
+                            <span>
+                              {playingMessageId === msg._id ? "Stop" : "Listen"}
+                            </span>
+                          </button>
+                        )}
                         <span>{formatTime(msg.createdAt)}</span>
                         {modelLabel && (
                           <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5">
@@ -336,10 +625,18 @@ export default function ChatPanel({ workspaceId }: Props) {
       </div>
 
       {/* Error banner */}
-      {error && (
+      {(error || voiceError || voiceInputError) && (
         <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2">
-          <p className="flex-1 text-sm text-red-400">{error}</p>
-          <button onClick={() => setError(null)} className="text-xs text-red-400/60 hover:text-red-400">
+          <p className="flex-1 text-sm text-red-400">
+            {error || voiceError || voiceInputError}
+          </p>
+          <button
+            onClick={() => {
+              setError(null);
+              setVoiceError(null);
+            }}
+            className="text-xs text-red-400/60 hover:text-red-400"
+          >
             Dismiss
           </button>
         </div>
@@ -376,7 +673,26 @@ export default function ChatPanel({ workspaceId }: Props) {
             disabled={isLoading}
             className="flex-1 bg-transparent px-2 py-2 text-sm text-foreground placeholder-muted-foreground outline-none disabled:opacity-50"
           />
+          {voiceInputSupported && (
+            <button
+              type="button"
+              onClick={handleVoiceInput}
+              disabled={isLoading}
+              className={`flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 transition-all ${
+                isListening
+                  ? "bg-rose/20 text-rose"
+                  : "bg-white/5 text-muted-foreground hover:border-rose/30 hover:text-foreground"
+              } disabled:opacity-50`}
+              aria-label={isListening ? "Stop voice input" : "Start voice input"}
+              title={isListening ? "Stop voice input" : "Start voice input"}
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-12 0v1.5a6 6 0 006 6m0 0v3m-3.75 0h7.5M12 15a3 3 0 003-3V6.75a3 3 0 10-6 0V12a3 3 0 003 3z" />
+              </svg>
+            </button>
+          )}
           <button
+            type="button"
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || isLoading}
             className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-rose to-pink-500 text-white shadow-lg shadow-rose/20 transition-all hover:brightness-110 disabled:opacity-50 disabled:shadow-none"
@@ -395,10 +711,14 @@ export default function ChatPanel({ workspaceId }: Props) {
         </div>
         <div className="flex items-center justify-between px-1">
           <p className="text-xs text-muted-foreground">
-            Enter to send
+            {voiceInputSupported
+              ? isListening
+                ? "Listening... speak naturally"
+                : "Enter to send or use the mic"
+              : "Enter to send"}
           </p>
           <p className="text-xs text-muted-foreground">
-            Responses validated before display
+            Voice playback is available for assistant replies
           </p>
         </div>
       </div>
