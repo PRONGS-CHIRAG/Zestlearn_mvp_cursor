@@ -4,11 +4,13 @@ import {
   VoiceGenerationError,
   generateSpeech,
 } from "@/lib/voice/elevenlabs";
+import { prepareNarrationText, MAX_NARRATION_LENGTH } from "@/lib/voice/prepareNarrationText";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_TEXT_LENGTH = 4000;
+// Generous raw payload ceiling to prevent abuse — not the real voice limit.
+const MAX_RAW_PAYLOAD = 50_000;
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,10 +27,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (text.length > MAX_TEXT_LENGTH) {
+    if (text.length > MAX_RAW_PAYLOAD) {
       return NextResponse.json(
-        { success: false, error: "Text is too long for voice playback" },
-        { status: 400 }
+        { success: false, error: "Payload too large" },
+        { status: 413 }
+      );
+    }
+
+    // Clean and truncate the text before sending to ElevenLabs.
+    const narration = prepareNarrationText(text.trim());
+
+    if (!narration) {
+      return NextResponse.json(
+        { success: false, error: "No speakable text could be extracted from this reply." },
+        { status: 422 }
       );
     }
 
@@ -47,6 +59,9 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": result.contentType,
         "Cache-Control": "no-store",
+        "X-Narration-Length": String(narration.length),
+        "X-Narration-Max": String(MAX_NARRATION_LENGTH),
+        "X-Narration-Truncated": String(narration.length >= MAX_NARRATION_LENGTH),
       },
     });
   } catch (error) {

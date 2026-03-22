@@ -1,4 +1,4 @@
-const MAX_NARRATION_LENGTH = 2200;
+export const MAX_NARRATION_LENGTH = 2200;
 
 /**
  * Convert markdown-heavy assistant output into a more natural spoken script.

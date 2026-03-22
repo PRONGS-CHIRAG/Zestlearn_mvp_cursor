@@ -159,18 +159,18 @@ export default function ChatPanel({ workspaceId }: Props) {
     setLoadingVoiceMessageId(null);
   }, []);
 
+  const handleTranscript = useCallback((text: string) => {
+    setInputValue((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+    inputRef.current?.focus();
+  }, []);
+
   const {
     isSupported: voiceInputSupported,
     isListening,
     error: voiceInputError,
     startListening,
     stopListening,
-  } = useVoiceInput({
-    onTranscript: (text) => {
-      setInputValue((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
-      inputRef.current?.focus();
-    },
-  });
+  } = useVoiceInput({ onTranscript: handleTranscript });
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -360,10 +360,14 @@ export default function ChatPanel({ workspaceId }: Props) {
     if (!latestAssistantMessage) return;
     if (latestAssistantMessage._id === lastAutoPlayedMessageIdRef.current) return;
 
+    // Mark as attempted immediately so we never retry the same message.
     lastAutoPlayedMessageIdRef.current = latestAssistantMessage._id;
-    void handlePlayVoice(latestAssistantMessage._id, latestAssistantMessage.content, {
+
+    handlePlayVoice(latestAssistantMessage._id, latestAssistantMessage.content, {
       voiceId: selectedVoiceId,
       playbackRate,
+    }).catch(() => {
+      // Autoplay failures are non-fatal — the user can still click "Listen" manually.
     });
   }, [
     autoPlayVoice,
