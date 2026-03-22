@@ -4,14 +4,12 @@ import { v } from "convex/values";
 export default defineSchema({
   users: defineTable({
     name: v.optional(v.string()),
-    email: v.string(),
-    passwordHash: v.string(),
-    lastLoginAt: v.optional(v.number()),
+    email: v.optional(v.string()),
     createdAt: v.number(),
-  }).index("by_email", ["email"]),
+  }),
 
   workspaces: defineTable({
-    createdBy: v.id("users"),
+    createdBy: v.optional(v.id("users")),
     companyName: v.string(),
     companyType: v.string(),
     companySize: v.string(),

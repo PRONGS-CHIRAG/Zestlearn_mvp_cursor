@@ -5,7 +5,6 @@ import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import type { OpportunityReport } from "@/types/report";
 import { ReportPdfDocument } from "@/lib/reports/renderPdfDocument";
-import { requireOwnership } from "@/lib/auth/requireSession";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,14 +35,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         { error: "workspaceId is required" },
         { status: 400 }
-      );
-    }
-
-    const session = await requireOwnership(workspaceId);
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
       );
     }
 

@@ -3,7 +3,6 @@ import { v } from "convex/values";
 
 export const createWorkspace = mutation({
   args: {
-    createdBy: v.id("users"),
     companyName: v.string(),
     companyType: v.string(),
     companySize: v.string(),

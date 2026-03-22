@@ -3,7 +3,6 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import { getModelById } from "@/lib/ai/models";
-import { requireOwnership } from "@/lib/auth/requireSession";
 import { GeminiProvider } from "@/lib/ai/providers/gemini";
 import { FeatherlessProvider } from "@/lib/ai/providers/featherless";
 import { validateChatResponse } from "@/lib/ai/validation";
@@ -52,14 +51,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { success: false, error: "workspaceId, message, and modelId are required" },
         { status: 400 }
-      );
-    }
-
-    const session = await requireOwnership(workspaceId);
-    if (!session) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
       );
     }
 

@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import type {
   AssessmentInput,
   AssessmentValidationErrors,
@@ -9,11 +11,8 @@ import type {
 import CompanyDetailsStep from "./CompanyDetailsStep";
 import BottleneckStep from "./BottleneckStep";
 import AIMaturityStep from "./AIMaturityStep";
-import AccountDetailsStep from "./AccountDetailsStep";
 
 const initialState: AssessmentInput = {
-  email: "",
-  password: "",
   companyName: "",
   companyType: "",
   companySize: "",
@@ -27,13 +26,14 @@ const initialState: AssessmentInput = {
 };
 
 interface Props {
+  // kept for testing/storybook overrides — production uses Convex directly
   onSubmit?: (data: AssessmentInput) => Promise<{ success: boolean; workspaceId?: string; error?: string }>;
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export default function AssessmentForm({ onSubmit }: Props) {
   const router = useRouter();
+  const createWorkspace = useMutation(api.workspaces.createWorkspace);
+  const submitAssessmentMutation = useMutation(api.assessments.submitAssessment);
   const [form, setForm] = useState<AssessmentInput>(initialState);
   const [errors, setErrors] = useState<AssessmentValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -50,6 +50,7 @@ export default function AssessmentForm({ onSubmit }: Props) {
       ...prev,
       [name]: name === "aiMaturity" ? Number(value) : value,
     }));
+    // Clear error when user types
     if (errors[name as keyof AssessmentValidationErrors]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
@@ -58,6 +59,7 @@ export default function AssessmentForm({ onSubmit }: Props) {
   function handleBlur(e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
+    // Validate single field on blur
     validateField(name as keyof AssessmentInput);
   }
 
@@ -66,58 +68,51 @@ export default function AssessmentForm({ onSubmit }: Props) {
     let error: string | undefined;
 
     switch (fieldName) {
-      case "email":
-        if (!value || (typeof value === "string" && !value.trim()))
-          error = "Email is required";
-        else if (typeof value === "string" && !EMAIL_RE.test(value.trim()))
-          error = "Please enter a valid email address";
-        break;
-      case "password":
-        if (!value) error = "Password is required";
-        else if (typeof value === "string" && value.length < 8)
-          error = "Password must be at least 8 characters";
-        else if (typeof value === "string" && !/[a-zA-Z]/.test(value))
-          error = "Password must contain at least one letter";
-        else if (typeof value === "string" && !/[0-9]/.test(value))
-          error = "Password must contain at least one number";
-        break;
       case "companyName":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Company name is required";
-        else if (typeof value === "string" && value.length < 2)
+        } else if (typeof value === "string" && value.length < 2) {
           error = "Company name must be at least 2 characters";
+        }
         break;
       case "companyType":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Please select a company type";
+        }
         break;
       case "companySize":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Please select a company size";
+        }
         break;
       case "department":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Department is required";
+        }
         break;
       case "role":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Your role is required";
+        }
         break;
       case "bottleneck":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Please describe your main bottleneck";
-        else if (typeof value === "string" && value.length < 20)
+        } else if (typeof value === "string" && value.length < 20) {
           error = "Please provide more detail (at least 20 characters)";
+        }
         break;
       case "desiredOutcome":
-        if (!value || (typeof value === "string" && !value.trim()))
+        if (!value || (typeof value === "string" && !value.trim())) {
           error = "Please describe your desired outcome";
-        else if (typeof value === "string" && value.length < 10)
+        } else if (typeof value === "string" && value.length < 10) {
           error = "Please provide more detail (at least 10 characters)";
+        }
         break;
       case "aiMaturity":
-        if (typeof value === "number" && (value < 1 || value > 5))
+        if (typeof value === "number" && (value < 1 || value > 5)) {
           error = "AI maturity must be between 1 and 5";
+        }
         break;
     }
 
@@ -130,30 +125,44 @@ export default function AssessmentForm({ onSubmit }: Props) {
   function validate(): boolean {
     const newErrors: AssessmentValidationErrors = {};
 
-    if (!form.email.trim()) newErrors.email = "Email is required";
-    else if (!EMAIL_RE.test(form.email.trim())) newErrors.email = "Please enter a valid email address";
+    // Required fields
+    if (!form.companyName.trim()) {
+      newErrors.companyName = "Company name is required";
+    } else if (form.companyName.length < 2) {
+      newErrors.companyName = "Company name must be at least 2 characters";
+    }
 
-    if (!form.password) newErrors.password = "Password is required";
-    else if (form.password.length < 8) newErrors.password = "Password must be at least 8 characters";
-    else if (!/[a-zA-Z]/.test(form.password)) newErrors.password = "Password must contain at least one letter";
-    else if (!/[0-9]/.test(form.password)) newErrors.password = "Password must contain at least one number";
+    if (!form.companyType.trim()) {
+      newErrors.companyType = "Please select a company type";
+    }
 
-    if (!form.companyName.trim()) newErrors.companyName = "Company name is required";
-    else if (form.companyName.length < 2) newErrors.companyName = "Company name must be at least 2 characters";
+    if (!form.companySize.trim()) {
+      newErrors.companySize = "Please select a company size";
+    }
 
-    if (!form.companyType.trim()) newErrors.companyType = "Please select a company type";
-    if (!form.companySize.trim()) newErrors.companySize = "Please select a company size";
-    if (!form.department.trim()) newErrors.department = "Department is required";
-    if (!form.role.trim()) newErrors.role = "Your role is required";
+    if (!form.department.trim()) {
+      newErrors.department = "Department is required";
+    }
 
-    if (!form.bottleneck.trim()) newErrors.bottleneck = "Please describe your main bottleneck";
-    else if (form.bottleneck.length < 20) newErrors.bottleneck = "Please provide more detail (at least 20 characters)";
+    if (!form.role.trim()) {
+      newErrors.role = "Your role is required";
+    }
 
-    if (!form.desiredOutcome.trim()) newErrors.desiredOutcome = "Please describe your desired outcome";
-    else if (form.desiredOutcome.length < 10) newErrors.desiredOutcome = "Please provide more detail (at least 10 characters)";
+    if (!form.bottleneck.trim()) {
+      newErrors.bottleneck = "Please describe your main bottleneck";
+    } else if (form.bottleneck.length < 20) {
+      newErrors.bottleneck = "Please provide more detail (at least 20 characters)";
+    }
 
-    if (!form.aiMaturity || form.aiMaturity < 1 || form.aiMaturity > 5)
+    if (!form.desiredOutcome.trim()) {
+      newErrors.desiredOutcome = "Please describe your desired outcome";
+    } else if (form.desiredOutcome.length < 10) {
+      newErrors.desiredOutcome = "Please provide more detail (at least 10 characters)";
+    }
+
+    if (!form.aiMaturity || form.aiMaturity < 1 || form.aiMaturity > 5) {
       newErrors.aiMaturity = "AI maturity must be between 1 and 5";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -163,6 +172,7 @@ export default function AssessmentForm({ onSubmit }: Props) {
     e.preventDefault();
 
     if (!validate()) {
+      // Scroll to first error
       const firstErrorField = document.querySelector("[data-error='true']");
       firstErrorField?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
@@ -173,6 +183,7 @@ export default function AssessmentForm({ onSubmit }: Props) {
 
     try {
       if (onSubmit) {
+        // allow override for testing/storybook
         const result = await onSubmit(form);
         if (result.success && result.workspaceId) {
           router.push(`/workspace/${result.workspaceId}`);
@@ -182,20 +193,32 @@ export default function AssessmentForm({ onSubmit }: Props) {
         return;
       }
 
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      // Step 1: create workspace record with company profile
+      const result = await createWorkspace({
+        companyName: form.companyName,
+        companyType: form.companyType,
+        companySize: form.companySize,
+        department: form.department,
+        role: form.role,
+        aiMaturity: form.aiMaturity,
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        setServerError(data.error || "Registration failed. Please try again.");
-        return;
+      const workspaceId = result?.workspaceId;
+      if (!workspaceId) {
+        throw new Error("Workspace creation returned no ID — check Convex logs.");
       }
 
-      router.push(`/workspace/${data.workspaceId}`);
+      // Step 2: save assessment data linked to the workspace
+      await submitAssessmentMutation({
+        workspaceId,
+        bottleneck: form.bottleneck,
+        desiredOutcome: form.desiredOutcome,
+        currentTools: form.currentTools || undefined,
+        dataAvailability: form.dataAvailability || undefined,
+      });
+
+      // Step 3: navigate to the live workspace
+      router.push(`/workspace/${workspaceId}`);
     } catch (err) {
       const message =
         err instanceof Error
@@ -209,8 +232,6 @@ export default function AssessmentForm({ onSubmit }: Props) {
   }
 
   const completedFields = [
-    form.email,
-    form.password,
     form.companyName,
     form.companyType,
     form.companySize,
@@ -218,9 +239,9 @@ export default function AssessmentForm({ onSubmit }: Props) {
     form.role,
     form.bottleneck,
     form.desiredOutcome,
-  ].filter((f) => f && String(f).trim().length > 0).length;
+  ].filter((f) => f && f.trim().length > 0).length;
 
-  const totalRequiredFields = 9;
+  const totalRequiredFields = 7;
   const progressPercent = Math.round((completedFields / totalRequiredFields) * 100);
 
   return (
@@ -239,20 +260,34 @@ export default function AssessmentForm({ onSubmit }: Props) {
         </div>
       </div>
 
-      {/* Account Details */}
+      {/* Company Details */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Account Details</h2>
-            <p className="text-sm text-muted-foreground">Create your login credentials</p>
+            <h2 className="text-lg font-semibold text-foreground">
+              Company Details
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Tell us about your organization
+            </p>
           </div>
         </div>
-        <AccountDetailsStep
+        <CompanyDetailsStep
           form={form}
           errors={errors}
           onChange={handleChange}
@@ -262,38 +297,39 @@ export default function AssessmentForm({ onSubmit }: Props) {
 
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-      {/* Company Details */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Company Details</h2>
-            <p className="text-sm text-muted-foreground">Tell us about your organization</p>
-          </div>
-        </div>
-        <CompanyDetailsStep form={form} errors={errors} onChange={handleChange} onBlur={handleBlur} />
-      </div>
-
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
       {/* Bottleneck & Goals */}
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Challenges & Goals</h2>
-            <p className="text-sm text-muted-foreground">What problems are you trying to solve?</p>
+            <h2 className="text-lg font-semibold text-foreground">
+              Challenges & Goals
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              What problems are you trying to solve?
+            </p>
           </div>
         </div>
-        <BottleneckStep form={form} errors={errors} onChange={handleChange} onBlur={handleBlur} />
+        <BottleneckStep
+          form={form}
+          errors={errors}
+          onChange={handleChange}
+          onBlur={handleBlur}
+        />
       </div>
 
       <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -302,13 +338,27 @@ export default function AssessmentForm({ onSubmit }: Props) {
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-rose/20 to-rose/10 text-rose ring-1 ring-rose/20">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-foreground">AI Readiness</h2>
-            <p className="text-sm text-muted-foreground">Your current AI adoption level</p>
+            <h2 className="text-lg font-semibold text-foreground">
+              AI Readiness
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Your current AI adoption level
+            </p>
           </div>
         </div>
         <AIMaturityStep form={form} errors={errors} onChange={handleChange} />
@@ -317,11 +367,21 @@ export default function AssessmentForm({ onSubmit }: Props) {
       {/* Server error */}
       {serverError && (
         <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3">
-          <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          <svg
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-400"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
           </svg>
           <div>
-            <p className="text-sm font-medium text-red-400">Submission failed</p>
+            <p className="text-sm font-medium text-red-400">
+              Submission failed
+            </p>
             <p className="mt-0.5 text-sm text-red-400/80">{serverError}</p>
           </div>
         </div>
@@ -333,20 +393,47 @@ export default function AssessmentForm({ onSubmit }: Props) {
         disabled={loading}
         className="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-rose to-pink-500 px-6 py-4 text-base font-semibold text-white shadow-lg shadow-rose/25 transition-all duration-300 hover:shadow-xl hover:shadow-rose/30 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
+        {/* Button glow effect */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
         {loading ? (
           <>
-            <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <svg
+              className="h-5 w-5 animate-spin"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
-            <span>Creating your account...</span>
+            <span>Creating your workspace...</span>
           </>
         ) : (
           <>
-            <span>Create Account & Workspace</span>
-            <svg className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            <span>Create My Workspace</span>
+            <svg
+              className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
             </svg>
           </>
         )}
@@ -354,8 +441,14 @@ export default function AssessmentForm({ onSubmit }: Props) {
 
       {/* Helper text */}
       <p className="text-center text-xs text-muted-foreground">
-        Already have an account?{" "}
-        <a href="/login" className="text-rose hover:underline">Log in</a>
+        By submitting, you agree to our{" "}
+        <a href="/terms" className="text-rose hover:underline">
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="/privacy" className="text-rose hover:underline">
+          Privacy Policy
+        </a>
       </p>
     </form>
   );
