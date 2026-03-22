@@ -63,6 +63,12 @@ export type DataAvailability = (typeof DATA_AVAILABILITY_OPTIONS)[number];
 // ----------------------------------------------------------------------------
 
 export interface AssessmentInput {
+  /** Account email address */
+  email: string;
+
+  /** Account password */
+  password: string;
+
   /** Company or organization name */
   companyName: string;
   
@@ -99,6 +105,8 @@ export interface AssessmentInput {
 // ----------------------------------------------------------------------------
 
 export interface AssessmentValidationErrors {
+  email?: string;
+  password?: string;
   companyName?: string;
   companyType?: string;
   companySize?: string;
@@ -218,6 +226,8 @@ export type AssessmentInputPartial = Partial<AssessmentInput>;
 
 export type RequiredAssessmentFields = Pick<
   AssessmentInput,
+  | 'email'
+  | 'password'
   | 'companyName'
   | 'companyType'
   | 'companySize'
@@ -238,6 +248,8 @@ export type OptionalAssessmentFields = Pick<
 // ----------------------------------------------------------------------------
 
 export const DEFAULT_ASSESSMENT_INPUT: AssessmentInput = {
+  email: '',
+  password: '',
   companyName: '',
   companyType: '',
   companySize: '',

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import OverviewPanel from "./OverviewPanel";
@@ -71,10 +72,22 @@ interface Props {
 }
 
 export default function WorkspaceShell({ workspaceId }: Props) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const { workspace, loading } = useWorkspace(workspaceId);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/logged-out");
+    } catch {
+      router.push("/logged-out");
+    }
+  }
 
   const companyName = workspace?.companyName ?? "Workspace";
   const departmentLabel = workspace?.department ?? "AI Assessment";
@@ -159,6 +172,16 @@ export default function WorkspaceShell({ workspaceId }: Props) {
               </svg>
               Upload Files
             </button>
+            <button
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.02] px-3.5 py-2 text-sm font-medium text-muted-foreground transition-all hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400 disabled:opacity-50"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+              </svg>
+              {loggingOut ? "Logging out..." : "Logout"}
+            </button>
           </div>
 
           <button
@@ -193,6 +216,13 @@ export default function WorkspaceShell({ workspaceId }: Props) {
               >
                 Export Report
               </Link>
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-red-400 hover:bg-red-500/5"
+              >
+                {loggingOut ? "Logging out..." : "Logout"}
+              </button>
             </div>
           </div>
         )}

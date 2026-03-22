@@ -7,6 +7,7 @@ import { summarizeDocument } from "@/lib/documents/summarizeDocument";
 import { isSupportedExtension } from "@/lib/documents/supportedTypes";
 import { GeminiProvider } from "@/lib/ai/providers/gemini";
 import { toReadableError } from "@/lib/utils/errors";
+import { requireOwnership } from "@/lib/auth/requireSession";
 
 // File size limit: 10 MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -31,6 +32,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { success: false, error: "workspaceId is required" },
         { status: 400 }
+      );
+    }
+
+    const session = await requireOwnership(workspaceId);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
       );
     }
 

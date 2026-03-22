@@ -1,6 +1,10 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import WorkspaceShell from "@/components/workspace/WorkspaceShell";
 import WorkspaceLoading from "./loading";
+import { requireOwnership } from "@/lib/auth/requireSession";
+
+export const dynamic = "force-dynamic";
 
 interface WorkspacePageProps {
   params: Promise<{ workspaceId: string }>;
@@ -8,6 +12,11 @@ interface WorkspacePageProps {
 
 export default async function WorkspacePage({ params }: WorkspacePageProps) {
   const { workspaceId } = await params;
+
+  const session = await requireOwnership(workspaceId);
+  if (!session) {
+    redirect("/login");
+  }
 
   return (
     <Suspense fallback={<WorkspaceLoading />}>
