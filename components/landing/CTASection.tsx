@@ -33,7 +33,7 @@ export function CTASection() {
             
             {/* Description */}
             <p className="mb-12 text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Stop guessing where AI fits in your organization. ZestLearn analyzes your 
+              Stop guessing where AI fits in your organization. Cellvara analyzes your 
               specific context and delivers actionable recommendations you can implement 
               immediately. Get clarity in minutes, not months.
             </p>

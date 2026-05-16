@@ -9,14 +9,14 @@ export function Footer() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <Image
-              src="/images/zestlearn-logo.png"
-              alt="ZestLearn"
+              src="/images/cellvara-logo.png"
+              alt="Cellvara"
               width={36}
               height={36}
               className="h-9 w-auto"
             />
             <span className="text-lg font-semibold tracking-tight text-foreground">
-              ZestLearn
+              Cellvara
             </span>
           </div>
 
@@ -40,7 +40,7 @@ export function Footer() {
 
           {/* Copyright */}
           <p className="text-sm text-muted-foreground">
-            {new Date().getFullYear()} ZestLearn. All rights reserved.
+            {new Date().getFullYear()} Cellvara. All rights reserved.
           </p>
         </div>
       </div>

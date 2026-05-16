@@ -10,7 +10,7 @@ let client: ConvexReactClient | null = null;
 function getClient(): ConvexReactClient {
   if (!convexUrl) {
     throw new Error(
-      "[ZestLearn] NEXT_PUBLIC_CONVEX_URL is not set.\n" +
+      "[Cellvara] NEXT_PUBLIC_CONVEX_URL is not set.\n" +
         "Run `npx convex dev` first, then restart the Next.js dev server."
     );
   }

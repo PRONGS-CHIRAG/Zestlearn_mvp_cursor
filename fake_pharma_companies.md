@@ -1,4 +1,4 @@
-# Fake Pharma / Biotech Companies for ZestLearn Testing
+# Fake Pharma / Biotech Companies for Cellvara Testing
 
 ## 1. NovaCura Biotech GmbH
 
@@ -38,7 +38,7 @@ NovaCura is growing quickly, but its internal knowledge is fragmented across sci
 * Difficulty tracking document versions
 * Heavy dependence on individual employees for context
 
-### Good ZestLearn Testing Themes
+### Good Cellvara Testing Themes
 
 * knowledge fragmentation
 * research memory assistant
@@ -86,7 +86,7 @@ HelixPharm handles a large volume of internal reports, SOPs, deviation records, 
 * Repetitive documentation work creates bottlenecks
 * Employees worry about errors in document handling
 
-### Good ZestLearn Testing Themes
+### Good Cellvara Testing Themes
 
 * document triage assistant
 * document classification
@@ -134,7 +134,7 @@ Rheonix has cross-functional teams working on clinical and product documentation
 * Project teams duplicate work because information is hard to find
 * Documentation and reporting take too much time
 
-### Good ZestLearn Testing Themes
+### Good Cellvara Testing Themes
 
 * workflow assistant
 * project/document tracking support

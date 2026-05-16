@@ -1,10 +1,10 @@
-# ZestLearn Technical PRD
+# Cellvara Technical PRD
 
 ## 1. Document Information
 
 ### Product
 
-**ZestLearn**
+**Cellvara**
 
 ### Document Type
 
@@ -26,7 +26,7 @@ Build a fully working MVP that allows a user to provide company context, upload 
 
 ## 2. Executive Summary
 
-ZestLearn is an AI consulting copilot designed for pharma and biotech SMEs that want practical help identifying where AI can create value. The MVP focuses on one end-to-end workflow:
+Cellvara is an AI consulting copilot designed for pharma and biotech SMEs that want practical help identifying where AI can create value. The MVP focuses on one end-to-end workflow:
 
 1. user starts an assessment,
 2. provides company and problem context,
@@ -49,7 +49,7 @@ Enable a user to go from a vague business problem to a practical first AI pilot 
 
 * Ground the system in uploaded company context
 * Produce structured outputs that can be shared internally
-* Demonstrate ZestLearn’s collective memory concept
+* Demonstrate Cellvara’s collective memory concept
 * Be fully demoable and functional within 24 hours of solo development
 
 ### Non-Goals
@@ -91,7 +91,7 @@ Pharma and biotech SMEs often understand that AI could create value, but they do
 
 ## 6. Solution Overview
 
-ZestLearn provides a guided workflow that combines structured onboarding, document-grounded AI reasoning, and a consultant-style interface to produce AI opportunity recommendations and a practical pilot roadmap.
+Cellvara provides a guided workflow that combines structured onboarding, document-grounded AI reasoning, and a consultant-style interface to produce AI opportunity recommendations and a practical pilot roadmap.
 
 The product’s technical design should support the following promise:
 
@@ -1202,7 +1202,7 @@ Collective layer feels too weak
 
 ## 28. Final Technical Summary
 
-The ZestLearn MVP should be implemented as a lightweight but complete AI consulting workflow. The architecture should prioritize speed, clarity, and demoability over complexity. The backend should store structured company context, document summaries, chat history, reports, and simple memory patterns. The LLM layer should be grounded in retrieved workspace context and return structured outputs that drive both the user experience and future memory reuse.
+The Cellvara MVP should be implemented as a lightweight but complete AI consulting workflow. The architecture should prioritize speed, clarity, and demoability over complexity. The backend should store structured company context, document summaries, chat history, reports, and simple memory patterns. The LLM layer should be grounded in retrieved workspace context and return structured outputs that drive both the user experience and future memory reuse.
 
 The MVP succeeds if it can consistently transform a user’s business bottleneck into:
 

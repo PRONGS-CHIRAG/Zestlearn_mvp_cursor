@@ -224,7 +224,7 @@ export default function AssessmentForm({ onSubmit }: Props) {
         err instanceof Error
           ? err.message
           : "An unexpected error occurred. Please try again.";
-      console.error("[ZestLearn] Assessment submit error:", message, err);
+      console.error("[Cellvara] Assessment submit error:", message, err);
       setServerError(message);
     } finally {
       setLoading(false);

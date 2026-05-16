@@ -1,18 +1,18 @@
-# ZestLearn MVP Context
+# Cellvara MVP Context
 
 ## 1. Product Overview
 
 ### Product Name
 
-**ZestLearn**
+**Cellvara**
 
 ### MVP Working Title
 
-**ZestLearn — AI Consultant Copilot for Pharma & Biotech SMEs**
+**Cellvara — AI Consultant Copilot for Pharma & Biotech SMEs**
 
 ### Core Idea
 
-ZestLearn is a domain-aware AI consultant platform designed to help pharma and biotech SMEs identify valuable AI opportunities, assess implementation readiness, understand risks, and generate practical pilot roadmaps.
+Cellvara is a domain-aware AI consultant platform designed to help pharma and biotech SMEs identify valuable AI opportunities, assess implementation readiness, understand risks, and generate practical pilot roadmaps.
 
 The MVP should not try to be a full enterprise platform. Instead, it should prove one focused value proposition:
 
@@ -28,7 +28,7 @@ Many pharma and biotech SMEs are interested in AI, but they often face the follo
 * They are worried about compliance, privacy, feasibility, and ROI.
 * They need practical recommendations, not generic AI hype.
 
-ZestLearn addresses this by acting as an AI transformation copilot that:
+Cellvara addresses this by acting as an AI transformation copilot that:
 
 * understands the company context,
 * analyzes uploaded materials,
@@ -42,7 +42,7 @@ ZestLearn addresses this by acting as an AI transformation copilot that:
 
 ### Primary Goal
 
-Build a fully working MVP in 24 hours as a solo founder that demonstrates the core ZestLearn concept.
+Build a fully working MVP in 24 hours as a solo founder that demonstrates the core Cellvara concept.
 
 ### What Success Looks Like
 
@@ -67,11 +67,11 @@ The MVP should clearly answer this question for the user:
 
 ### Positioning Statement
 
-ZestLearn is an AI consulting copilot for pharma and biotech SMEs that helps teams identify high-value AI opportunities, assess readiness, and generate practical pilot roadmaps using company context and collective organizational learning.
+Cellvara is an AI consulting copilot for pharma and biotech SMEs that helps teams identify high-value AI opportunities, assess readiness, and generate practical pilot roadmaps using company context and collective organizational learning.
 
 ### Elevator Pitch
 
-ZestLearn helps pharma and biotech SMEs move from AI curiosity to AI action. Instead of acting like a generic chatbot, it behaves like a domain-aware consultant that understands company pain points, reviews internal context, identifies practical AI opportunities, flags risks, and recommends the best pilot to start with.
+Cellvara helps pharma and biotech SMEs move from AI curiosity to AI action. Instead of acting like a generic chatbot, it behaves like a domain-aware consultant that understands company pain points, reviews internal context, identifies practical AI opportunities, flags risks, and recommends the best pilot to start with.
 
 ### What It Is
 
@@ -145,9 +145,9 @@ Possible target roles include:
 * Recommendations grounded in their context
 * Practical next steps
 
-### Why They Would Use ZestLearn
+### Why They Would Use Cellvara
 
-Because ZestLearn reduces the “where do we even start?” problem and turns scattered business context into a concrete AI pilot recommendation.
+Because Cellvara reduces the “where do we even start?” problem and turns scattered business context into a concrete AI pilot recommendation.
 
 ---
 
@@ -159,7 +159,7 @@ Pharma and biotech SMEs often know that AI could help their business, but they s
 
 ## 6. Solution Statement
 
-ZestLearn provides a guided AI consulting experience for pharma and biotech SMEs. It captures business context, reviews uploaded documents, supports consultant-style Q&A, and produces a structured AI opportunity report that includes recommended use cases, implementation considerations, risks, and a pilot roadmap. It also stores reusable learnings so future recommendations become more informed.
+Cellvara provides a guided AI consulting experience for pharma and biotech SMEs. It captures business context, reviews uploaded documents, supports consultant-style Q&A, and produces a structured AI opportunity report that includes recommended use cases, implementation considerations, risks, and a pilot roadmap. It also stores reusable learnings so future recommendations become more informed.
 
 ---
 
@@ -262,7 +262,7 @@ Give each user/company a place where all context, chats, documents, and reports 
 
 ### Why It Matters
 
-The workspace is the persistent context layer for ZestLearn.
+The workspace is the persistent context layer for Cellvara.
 
 ---
 
@@ -357,7 +357,7 @@ Free-text questions such as:
 
 ### Why It Matters
 
-This is the heart of the product experience and should make ZestLearn feel like a true AI consultant.
+This is the heart of the product experience and should make Cellvara feel like a true AI consultant.
 
 ---
 
@@ -402,7 +402,7 @@ This is the key artifact users can take to their team or leadership.
 
 ### Purpose
 
-Demonstrate the unique ZestLearn idea that the system learns from repeated interactions and builds reusable organizational intelligence.
+Demonstrate the unique Cellvara idea that the system learns from repeated interactions and builds reusable organizational intelligence.
 
 ### MVP Interpretation
 
@@ -440,7 +440,7 @@ Stores reusable patterns such as:
 
 ### Why It Matters
 
-This is what differentiates ZestLearn from a normal chatbot.
+This is what differentiates Cellvara from a normal chatbot.
 
 ---
 
@@ -452,7 +452,7 @@ The user journey should be simple, guided, and useful from start to finish.
 
 ### Step 1: Landing Page
 
-User understands what ZestLearn does.
+User understands what Cellvara does.
 
 #### Landing Page Goals
 
@@ -780,7 +780,7 @@ Move the user into the onboarding assessment as quickly as possible.
 ### Sections
 
 * Hero
-* What ZestLearn does
+* What Cellvara does
 * Who it is for
 * How it works
 * Why it is different
@@ -793,7 +793,7 @@ Move the user into the onboarding assessment as quickly as possible.
 Find the best AI pilot for your pharma or biotech team.
 
 **Subheadline:**
-ZestLearn analyzes your business context, documents, and pain points to recommend practical AI use cases, flag risks, and generate a roadmap you can act on.
+Cellvara analyzes your business context, documents, and pain points to recommend practical AI use cases, flag risks, and generate a roadmap you can act on.
 
 **CTA:**
 Start Your AI Assessment
@@ -878,9 +878,9 @@ Start Your AI Assessment
 
 ## 17. Product Differentiation
 
-### Why ZestLearn Is Different
+### Why Cellvara Is Different
 
-ZestLearn is not only answering questions. It is:
+Cellvara is not only answering questions. It is:
 
 * structured,
 * domain-aware,
@@ -950,9 +950,9 @@ The MVP should be optimized for proving product value in a live demo.
 
 ## 20. Final MVP Summary
 
-ZestLearn MVP should be a focused AI consultant copilot for pharma and biotech SMEs. The user enters business context, uploads a few documents, asks practical questions, and receives a structured AI opportunity report with recommended use cases, risks, and a roadmap. The system stores learnings over time through a lightweight collective memory layer, which is the seed of the broader ZestLearn vision.
+Cellvara MVP should be a focused AI consultant copilot for pharma and biotech SMEs. The user enters business context, uploads a few documents, asks practical questions, and receives a structured AI opportunity report with recommended use cases, risks, and a roadmap. The system stores learnings over time through a lightweight collective memory layer, which is the seed of the broader Cellvara vision.
 
-This MVP should prove that ZestLearn can help a team move from:
+This MVP should prove that Cellvara can help a team move from:
 
 **“We think AI could help us”**
 

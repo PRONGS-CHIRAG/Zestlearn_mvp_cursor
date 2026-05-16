@@ -1,4 +1,4 @@
-export const APP_NAME = "ZestLearn";
+export const APP_NAME = "Cellvara";
 export const APP_TAGLINE = "AI Consultant Copilot for Pharma & Biotech SMEs";
 
 export const ROUTES = {

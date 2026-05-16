@@ -36,7 +36,7 @@ export function Hero() {
 
         {/* Subheadline */}
         <p className="mx-auto mb-12 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground sm:text-xl">
-          ZestLearn analyzes your business context, documents, and pain points
+          Cellvara analyzes your business context, documents, and pain points
           to recommend practical AI use cases and a clear implementation
           roadmap tailored specifically for your organization.
         </p>

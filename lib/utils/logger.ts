@@ -1,7 +1,7 @@
 type LogLevel = "info" | "warn" | "error";
 
 function log(level: LogLevel, message: string, data?: unknown): void {
-  const prefix = `[ZestLearn][${level.toUpperCase()}]`;
+  const prefix = `[Cellvara][${level.toUpperCase()}]`;
   if (data !== undefined) {
     console[level](`${prefix} ${message}`, data);
   } else {

@@ -1,14 +1,14 @@
-# ZestLearn Docs README
+# Cellvara Docs README
 
-This file is a quick guide to the planning and build documents created for the ZestLearn MVP.
+This file is a quick guide to the planning and build documents created for the Cellvara MVP.
 
-## 1. `zestlearn_context_md`
+## 1. `cellvara_context_md`
 
 **Purpose:** Product and business context document.
 
 Use this file to understand:
 
-* what ZestLearn is,
+* what Cellvara is,
 * who it is for,
 * the MVP scope,
 * user persona,
@@ -27,7 +27,7 @@ Best for:
 
 ---
 
-## 2. `zestlearn_technical_prd`
+## 2. `cellvara_technical_prd`
 
 **Purpose:** Technical product requirements document.
 
@@ -52,7 +52,7 @@ Best for:
 
 ---
 
-## 3. `zestlearn_system_architecture_and_api_contract`
+## 3. `cellvara_system_architecture_and_api_contract`
 
 **Purpose:** Engineering architecture and API design guide.
 
@@ -78,7 +78,7 @@ Best for:
 
 ---
 
-## 4. `zestlearn_cursor_implementation_plan`
+## 4. `cellvara_cursor_implementation_plan`
 
 **Purpose:** Execution plan for building the MVP in Cursor.
 
@@ -99,7 +99,7 @@ Best for:
 
 ---
 
-## 5. `zestlearn_master_cursor_prompt_pack`
+## 5. `cellvara_master_cursor_prompt_pack`
 
 **Purpose:** Copy-paste prompt library for Cursor.
 
@@ -124,7 +124,7 @@ Best for:
 
 ---
 
-## 6. `zestlearn_hackathon_build_checklist`
+## 6. `cellvara_hackathon_build_checklist`
 
 **Purpose:** Short execution checklist for the build.
 
@@ -286,12 +286,12 @@ These four files create a repo-level memory layer so:
 
 ## Recommended Usage Order
 
-1. Read `zestlearn_context_md`
-2. Read `zestlearn_technical_prd`
-3. Use `zestlearn_system_architecture_and_api_contract`
-4. Follow `zestlearn_cursor_implementation_plan`
-5. Build with `zestlearn_master_cursor_prompt_pack`
-6. Track progress using `zestlearn_hackathon_build_checklist`
+1. Read `cellvara_context_md`
+2. Read `cellvara_technical_prd`
+3. Use `cellvara_system_architecture_and_api_contract`
+4. Follow `cellvara_cursor_implementation_plan`
+5. Build with `cellvara_master_cursor_prompt_pack`
+6. Track progress using `cellvara_hackathon_build_checklist`
 7. Use `CURRENT_PLAN`, `IMPLEMENTATION_STATUS`, `DECISIONS`, and `NEXT_TASK` as the shared memory layer between Codex and Cursor
 8. Use `structuring_per_coder` for the structured execution and git workflow during implementation
 
@@ -299,4 +299,4 @@ These four files create a repo-level memory layer so:
 
 ## One-Line Summary
 
-These documents together define what ZestLearn is, how the MVP should work, how the system should be built, how to execute the build quickly in Cursor, how to maintain shared planning/implementation memory between Codex and Cursor, and how to keep implementation structured during the build.
+These documents together define what Cellvara is, how the MVP should work, how the system should be built, how to execute the build quickly in Cursor, how to maintain shared planning/implementation memory between Codex and Cursor, and how to keep implementation structured during the build.

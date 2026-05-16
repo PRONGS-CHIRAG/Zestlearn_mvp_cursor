@@ -1,8 +1,8 @@
-# ZestLearn Structured Build Plan
+# Cellvara Structured Build Plan
 
 ## Purpose
 
-This document explains how to build the ZestLearn MVP as a single implementer while using Codex for planning and Cursor for implementation.
+This document explains how to build the Cellvara MVP as a single implementer while using Codex for planning and Cursor for implementation.
 
 Even though the filename remains `structuring_per_coder.md`, this document now assumes:
 
@@ -13,9 +13,9 @@ Even though the filename remains `structuring_per_coder.md`, this document now a
 
 It is based on:
 
-- `zestlearn_cursor_implementation_plan.md`
-- `zestlearn_hackathon_build_checklist.md`
-- `zestlearn_system_architecture_and_api_contract.md`
+- `cellvara_cursor_implementation_plan.md`
+- `cellvara_hackathon_build_checklist.md`
+- `cellvara_system_architecture_and_api_contract.md`
 - `CURRENT_PLAN.md`
 - `IMPLEMENTATION_STATUS.md`
 - `DECISIONS.md`
@@ -56,13 +56,13 @@ Use the repo files as the shared memory between them:
 
 Read these first:
 
-1. `zestlearn_index.md`
+1. `cellvara_index.md`
 2. `CURRENT_PLAN.md`
 3. `IMPLEMENTATION_STATUS.md`
 4. `DECISIONS.md`
 5. `NEXT_TASK.md`
-6. `zestlearn_system_architecture_and_api_contract.md`
-7. `zestlearn_cursor_implementation_plan.md`
+6. `cellvara_system_architecture_and_api_contract.md`
+7. `cellvara_cursor_implementation_plan.md`
 
 Freeze these before implementing milestone features:
 
@@ -82,7 +82,7 @@ Recommended setup:
 
 ```bash
 git clone <repo-url>
-cd Zestlearn_mvp_cursor
+cd Cellvara_mvp_cursor
 git checkout main
 git pull origin main
 npm install
@@ -463,4 +463,4 @@ Use this exact model:
 - one active task branch at a time
 - shared memory files updated after each real milestone
 
-That is the cleanest setup for the current ZestLearn workflow.
+That is the cleanest setup for the current Cellvara workflow.

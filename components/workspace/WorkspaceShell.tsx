@@ -106,8 +106,8 @@ export default function WorkspaceShell({ workspaceId }: Props) {
             <Link href="/" className="group flex items-center gap-2.5 transition-opacity hover:opacity-80">
               <div className="relative">
                 <Image
-                  src="/images/zestlearn-logo.png"
-                  alt="ZestLearn"
+                  src="/images/cellvara-logo.png"
+                  alt="Cellvara"
                   width={36}
                   height={36}
                   className="h-9 w-9"
@@ -115,7 +115,7 @@ export default function WorkspaceShell({ workspaceId }: Props) {
                 <div className="absolute -inset-1 rounded-full bg-rose/20 opacity-0 blur-md transition-opacity group-hover:opacity-100" />
               </div>
               <span className="hidden text-lg font-semibold tracking-tight text-foreground sm:block">
-                ZestLearn
+                Cellvara
               </span>
             </Link>
 
@@ -246,7 +246,7 @@ export default function WorkspaceShell({ workspaceId }: Props) {
 
       <footer className="relative z-10 border-t border-white/[0.06] bg-card/30 backdrop-blur-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} ZestLearn. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} Cellvara. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/help" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
               Help
