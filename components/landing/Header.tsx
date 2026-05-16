@@ -8,14 +8,14 @@ export function Header() {
         <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/5 bg-background/60 px-6 py-3 backdrop-blur-xl">
           <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
             <Image
-              src="/images/zestlearn-logo.png"
-              alt="ZestLearn"
+              src="/images/cellvara-logo.png"
+              alt="Cellvara"
               width={44}
               height={44}
               className="h-9 w-auto"
             />
             <span className="text-lg font-semibold tracking-tight text-foreground">
-              ZestLearn
+              Cellvara
             </span>
           </Link>
 
