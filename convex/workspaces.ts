@@ -48,14 +48,23 @@ export const getWorkspaceDashboardData = query({
       .order("desc")
       .first();
 
-    const insights = await ctx.db
+    const wsPatterns = await ctx.db
       .query("memoryPatterns")
-      .collect()
-      .then((patterns) =>
-        patterns.filter(
-          (p) => p.scope === "shared" || p.workspaceId === workspaceId
-        )
-      );
+      .withIndex("by_workspace", (q) => q.eq("workspaceId", workspaceId))
+      .order("desc")
+      .take(20);
+
+    const sharedPatterns = await ctx.db
+      .query("memoryPatterns")
+      .withIndex("by_scope", (q) => q.eq("scope", "shared"))
+      .order("desc")
+      .take(10);
+
+    const seen = new Set(wsPatterns.map((p) => p._id));
+    const insights = [
+      ...wsPatterns,
+      ...sharedPatterns.filter((p) => !seen.has(p._id)),
+    ];
 
     return { workspace, assessment, documents, latestReport, insights };
   },

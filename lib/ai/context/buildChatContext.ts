@@ -56,6 +56,8 @@ export function buildRecentChatContext(messages: ChatMsg[]): string {
 }
 
 export function buildMemoryContext(patterns: MemoryPattern[]): string {
-  if (!patterns.length) return "";
-  return patterns.map((p) => `- [${p.category}] ${p.patternText}`).join("\n");
+  if (!patterns.length) return "No prior patterns available.";
+  return patterns
+    .map((p) => `- [${p.category}] ${p.patternText}`)
+    .join("\n");
 }

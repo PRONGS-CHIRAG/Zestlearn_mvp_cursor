@@ -31,11 +31,48 @@ export const listRelevantMemoryPatterns = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, { workspaceId, limit = 10 }) => {
-    const all = await ctx.db.query("memoryPatterns").collect();
-    return all
-      .filter(
-        (p) => p.scope === "shared" || p.workspaceId === workspaceId
-      )
-      .slice(0, limit);
+    const shared = await ctx.db
+      .query("memoryPatterns")
+      .withIndex("by_scope", (q) => q.eq("scope", "shared"))
+      .order("desc")
+      .take(limit);
+
+    if (!workspaceId) return shared.slice(0, limit);
+
+    const workspace = await ctx.db
+      .query("memoryPatterns")
+      .withIndex("by_workspace", (q) => q.eq("workspaceId", workspaceId))
+      .order("desc")
+      .take(limit);
+
+    const seen = new Set(workspace.map((p) => p._id));
+    return [...workspace, ...shared.filter((p) => !seen.has(p._id))].slice(0, limit);
+  },
+});
+
+export const seedSharedPatterns = mutation({
+  args: {
+    patterns: v.array(
+      v.object({
+        category: v.string(),
+        patternText: v.string(),
+        industry: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, { patterns }) => {
+    const ids = [];
+    for (const p of patterns) {
+      const id = await ctx.db.insert("memoryPatterns", {
+        scope: "shared",
+        category: p.category,
+        patternText: p.patternText,
+        industry: p.industry ?? "pharma/biotech",
+        sourceType: "seed",
+        createdAt: Date.now(),
+      });
+      ids.push(id);
+    }
+    return ids;
   },
 });

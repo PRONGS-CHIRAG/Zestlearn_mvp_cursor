@@ -9,6 +9,7 @@ export interface RecommendedUseCase {
 }
 
 export interface OpportunityReport {
+  executive_summary: string;
   problem_summary: string;
   current_pain_points: string[];
   recommended_use_cases: RecommendedUseCase[];
@@ -16,13 +17,21 @@ export interface OpportunityReport {
     title: string;
     why_this_first: string;
     success_metrics: string[];
+    estimated_timeline: string;
+  };
+  estimated_business_impact: {
+    efficiency_gains: string;
+    cost_reduction: string;
+    timeline_to_value: string;
   };
   roadmap_30_60_90: {
     days_30: string[];
     days_60: string[];
     days_90: string[];
   };
+  risks_and_constraints: string[];
   open_questions: string[];
+  assumptions: string[];
 }
 
 export interface ReportRecord {

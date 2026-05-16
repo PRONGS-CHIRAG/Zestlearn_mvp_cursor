@@ -85,7 +85,9 @@ export default defineSchema({
       v.literal("document")
     ),
     createdAt: v.number(),
-  }),
+  })
+    .index("by_workspace", ["workspaceId"])
+    .index("by_scope", ["scope"]),
 
   events: defineTable({
     workspaceId: v.optional(v.id("workspaces")),

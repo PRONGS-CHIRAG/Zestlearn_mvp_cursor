@@ -1,18 +1,19 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-
-interface Message {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: Date;
-  isTyping?: boolean;
-}
+import { useQuery } from "convex/react";
+import ReactMarkdown from "react-markdown";
+import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
+import { AVAILABLE_MODELS } from "@/lib/ai/models";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
+import {
+  AVAILABLE_ELEVENLABS_VOICES,
+  DEFAULT_VOICE_ID,
+} from "@/lib/voice/elevenlabs";
 
 interface Props {
   workspaceId: string;
-  onSendMessage?: (message: string) => Promise<string>;
 }
 
 const PROMPT_STARTERS = [
@@ -72,148 +73,311 @@ const PROMPT_STARTERS = [
   },
 ];
 
-function generateId(): string {
-  return Math.random().toString(36).substring(2, 15);
+const VOICE_SETTINGS_STORAGE_KEY = "zestlearn-chat-voice-settings";
+const PLAYBACK_RATE_OPTIONS = [0.85, 1, 1.15, 1.3] as const;
+
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+function MessageContent({ content, role }: { content: string; role: string }) {
+  if (role === "user") {
+    return <p className="whitespace-pre-wrap text-sm leading-relaxed">{content}</p>;
+  }
+
+  return (
+    <div
+      className="prose prose-sm prose-invert max-w-none prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90 prose-ul:my-2 prose-ol:my-2 prose-p:my-2"
+    >
+      <ReactMarkdown
+        components={{
+          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+          ul: ({ children }) => <ul className="mb-2 list-disc pl-5">{children}</ul>,
+          ol: ({ children }) => <ol className="mb-2 list-decimal pl-5">{children}</ol>,
+          li: ({ children }) => <li className="mb-1 marker:text-rose">{children}</li>,
+          strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+          em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
+          a: ({ children, href }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              className="text-rose underline underline-offset-2"
+            >
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
 }
 
-// Simulated AI response for demo
-async function simulateAIResponse(message: string): Promise<string> {
-  await new Promise((resolve) => setTimeout(resolve, 1500 + Math.random() * 1000));
-  
-  const responses: Record<string, string> = {
-    opportunities: `Based on your company profile and the documents you've shared, I've identified several high-impact AI opportunities:
-
-**1. Automated Document Analysis (High Impact)**
-Your team processes significant volumes of regulatory documents. AI-powered document analysis could reduce review time by 60-70%.
-
-**2. Predictive Quality Control**
-Implementing ML models for batch quality prediction could reduce QC failures by up to 40%.
-
-**3. Clinical Trial Optimization**
-AI can help optimize patient recruitment and trial design, potentially reducing timelines by 20-30%.
-
-Would you like me to elaborate on any of these opportunities?`,
-    automation: `For your data analysis workflows, I recommend a phased automation approach:
-
-**Phase 1: Data Ingestion (Weeks 1-4)**
-- Automate data collection from lab instruments
-- Implement validation rules and anomaly detection
-
-**Phase 2: Analysis Pipeline (Weeks 5-8)**
-- Build ML models for pattern recognition
-- Create automated reporting dashboards
-
-**Phase 3: Insights Generation (Weeks 9-12)**
-- Deploy predictive analytics
-- Set up alert systems for critical findings
-
-This approach ensures minimal disruption while maximizing efficiency gains.`,
-    pilot: `Based on your AI maturity level and current bottlenecks, I recommend starting with:
-
-**Recommended First Pilot: Automated Report Generation**
-
-*Why this project:*
-- Low technical complexity
-- High visibility to stakeholders
-- Clear ROI metrics
-- Builds internal AI capabilities
-
-*Timeline:* 8-12 weeks
-*Team:* 2 developers, 1 domain expert
-*Investment:* $25,000-40,000
-
-This pilot will demonstrate value quickly while building organizational confidence in AI adoption.`,
-    default: `That's a great question. Based on the context from your assessment and documents, I can help you explore this further.
-
-Could you provide more details about:
-- Your specific use case or workflow
-- The current challenges you're facing
-- Any constraints (budget, timeline, resources)
-
-This will help me give you more targeted recommendations.`,
-  };
-
-  const lowerMessage = message.toLowerCase();
-  if (lowerMessage.includes("opportunit")) return responses.opportunities;
-  if (lowerMessage.includes("automat")) return responses.automation;
-  if (lowerMessage.includes("pilot") || lowerMessage.includes("first")) return responses.pilot;
-  return responses.default;
-}
-
-export default function ChatPanel({ workspaceId, onSendMessage }: Props) {
+export default function ChatPanel({ workspaceId }: Props) {
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [selectedModelId, setSelectedModelId] = useState(AVAILABLE_MODELS[0].id);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [typingIndicator, setTypingIndicator] = useState(false);
+  const [playingMessageId, setPlayingMessageId] = useState<string | null>(null);
+  const [loadingVoiceMessageId, setLoadingVoiceMessageId] = useState<string | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [selectedVoiceId, setSelectedVoiceId] = useState(DEFAULT_VOICE_ID);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [autoPlayVoice, setAutoPlayVoice] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const lastAutoPlayedMessageIdRef = useRef<string | null>(null);
+
+  // Real messages from Convex
+  const convexMessages = useQuery(api.chat.listRecentMessagesByWorkspace, {
+    workspaceId: workspaceId as Id<"workspaces">,
+    limit: 50,
+  });
+  const messages = convexMessages ?? [];
+
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current = null;
+    }
+
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+
+    setPlayingMessageId(null);
+    setLoadingVoiceMessageId(null);
+  }, []);
+
+  const handleTranscript = useCallback((text: string) => {
+    setInputValue((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+    inputRef.current?.focus();
+  }, []);
+
+  const {
+    isSupported: voiceInputSupported,
+    isListening,
+    error: voiceInputError,
+    startListening,
+    stopListening,
+  } = useVoiceInput({ onTranscript: handleTranscript });
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
+    try {
+      const rawSettings = window.localStorage.getItem(
+        VOICE_SETTINGS_STORAGE_KEY
+      );
+      if (!rawSettings) return;
+
+      const parsed = JSON.parse(rawSettings) as {
+        selectedVoiceId?: string;
+        playbackRate?: number;
+        autoPlayVoice?: boolean;
+      };
+
+      if (
+        parsed.selectedVoiceId &&
+        AVAILABLE_ELEVENLABS_VOICES.some(
+          (voice) => voice.id === parsed.selectedVoiceId
+        )
+      ) {
+        setSelectedVoiceId(parsed.selectedVoiceId);
+      }
+
+      if (
+        typeof parsed.playbackRate === "number" &&
+        PLAYBACK_RATE_OPTIONS.includes(
+          parsed.playbackRate as (typeof PLAYBACK_RATE_OPTIONS)[number]
+        )
+      ) {
+        setPlaybackRate(parsed.playbackRate);
+      }
+
+      if (typeof parsed.autoPlayVoice === "boolean") {
+        setAutoPlayVoice(parsed.autoPlayVoice);
+      }
+    } catch {
+      // Ignore malformed persisted preferences and fall back to defaults.
+    }
+  }, []);
+
+  useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages, typingIndicator, scrollToBottom]);
+
+  useEffect(() => {
+    return () => {
+      stopAudio();
+    };
+  }, [stopAudio]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        VOICE_SETTINGS_STORAGE_KEY,
+        JSON.stringify({
+          selectedVoiceId,
+          playbackRate,
+          autoPlayVoice,
+        })
+      );
+    } catch {
+      // Ignore storage failures; voice settings will just stay session-only.
+    }
+  }, [selectedVoiceId, playbackRate, autoPlayVoice]);
 
   const handleSend = async (messageText?: string) => {
     const text = messageText || inputValue.trim();
     if (!text || isLoading) return;
 
-    const userMessage: Message = {
-      id: generateId(),
-      role: "user",
-      content: text,
-      timestamp: new Date(),
-    };
+    if (!selectedModelId) {
+      setError("Please select exactly 1 model before sending.");
+      return;
+    }
 
-    setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
+    setError(null);
     setIsLoading(true);
-
-    // Add typing indicator
-    const typingId = generateId();
-    setMessages((prev) => [
-      ...prev,
-      { id: typingId, role: "assistant", content: "", timestamp: new Date(), isTyping: true },
-    ]);
+    setTypingIndicator(true);
 
     try {
-      const response = onSendMessage
-        ? await onSendMessage(text)
-        : await simulateAIResponse(text);
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workspaceId,
+          message: text,
+          modelId: selectedModelId,
+        }),
+      });
 
-      // Remove typing indicator and add response
-      setMessages((prev) => [
-        ...prev.filter((m) => m.id !== typingId),
-        {
-          id: generateId(),
-          role: "assistant",
-          content: response,
-          timestamp: new Date(),
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev.filter((m) => m.id !== typingId),
-        {
-          id: generateId(),
-          role: "assistant",
-          content: "I apologize, but I encountered an error processing your request. Please try again.",
-          timestamp: new Date(),
-        },
-      ]);
+      const json = await res.json();
+
+      if (!res.ok || !json.success) {
+        setError(json.error || "Failed to get a response. Please try again.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Chat request failed.");
     } finally {
       setIsLoading(false);
+      setTypingIndicator(false);
     }
   };
 
-  const handlePromptClick = (prompt: string) => {
-    handleSend(prompt);
+  const handlePlayVoice = useCallback(async (
+    messageId: string,
+    content: string,
+    options?: { voiceId?: string; playbackRate?: number }
+  ) => {
+    setVoiceError(null);
+
+    if (playingMessageId === messageId) {
+      stopAudio();
+      return;
+    }
+
+    stopAudio();
+    setLoadingVoiceMessageId(messageId);
+
+    try {
+      const res = await fetch("/api/chat/voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          workspaceId,
+          text: content,
+          voiceId: options?.voiceId ?? selectedVoiceId,
+        }),
+      });
+
+      if (!res.ok) {
+        const json = (await res.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(json?.error || "Failed to generate voice playback.");
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+
+      audioUrlRef.current = url;
+      audioRef.current = audio;
+      audio.playbackRate = options?.playbackRate ?? playbackRate;
+      setPlayingMessageId(messageId);
+      setLoadingVoiceMessageId(null);
+
+      audio.onended = () => {
+        stopAudio();
+      };
+
+      audio.onerror = () => {
+        setVoiceError("Voice playback failed.");
+        stopAudio();
+      };
+
+      await audio.play();
+    } catch (err) {
+      setLoadingVoiceMessageId(null);
+      setPlayingMessageId(null);
+      setVoiceError(
+        err instanceof Error ? err.message : "Voice playback failed."
+      );
+    }
+  }, [playbackRate, selectedVoiceId, stopAudio, workspaceId]);
+
+  const handleVoiceInput = () => {
+    if (!voiceInputSupported) return;
+    setVoiceError(null);
+    if (isListening) {
+      stopListening();
+      return;
+    }
+    startListening();
   };
+
+  useEffect(() => {
+    if (!autoPlayVoice || !messages.length || isLoading || typingIndicator) return;
+
+    const latestAssistantMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.role === "assistant");
+
+    if (!latestAssistantMessage) return;
+    if (latestAssistantMessage._id === lastAutoPlayedMessageIdRef.current) return;
+
+    // Mark as attempted immediately so we never retry the same message.
+    lastAutoPlayedMessageIdRef.current = latestAssistantMessage._id;
+
+    handlePlayVoice(latestAssistantMessage._id, latestAssistantMessage.content, {
+      voiceId: selectedVoiceId,
+      playbackRate,
+    }).catch(() => {
+      // Autoplay failures are non-fatal — the user can still click "Listen" manually.
+    });
+  }, [
+    autoPlayVoice,
+    handlePlayVoice,
+    messages,
+    isLoading,
+    typingIndicator,
+    selectedVoiceId,
+    playbackRate,
+  ]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -222,28 +386,16 @@ export default function ChatPanel({ workspaceId, onSendMessage }: Props) {
     }
   };
 
-  const clearChat = () => {
-    setMessages([]);
-  };
+  const showPromptStarters = messages.length === 0 && !typingIndicator;
 
   return (
     <div className="flex h-[calc(100vh-220px)] flex-col">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-rose/20 bg-gradient-to-br from-rose/20 to-pink-500/10">
-            <svg
-              className="h-6 w-6 text-rose"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"
-              />
+            <svg className="h-6 w-6 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
             </svg>
           </div>
           <div>
@@ -253,44 +405,70 @@ export default function ChatPanel({ workspaceId, onSendMessage }: Props) {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          {messages.length > 0 && (
-            <button
-              onClick={clearChat}
-              className="flex items-center gap-2 rounded-lg border border-white/10 bg-muted/30 px-3 py-2 text-sm text-muted-foreground transition-all hover:border-white/20 hover:text-foreground"
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-              </svg>
-              Clear
-            </button>
-          )}
+        <div className="flex flex-col gap-3 lg:items-end">
           <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5">
             <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
             <span className="text-xs font-medium text-emerald-400">Online</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-rose/20 bg-rose/5 px-3 py-2">
+            <label className="text-[11px] font-medium text-rose/70">
+              Voice
+            </label>
+            <select
+              value={selectedVoiceId}
+              onChange={(e) => setSelectedVoiceId(e.target.value)}
+              className="rounded-md border border-rose/20 bg-rose/10 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/40 hover:bg-rose/15 focus:border-rose/60"
+            >
+              {AVAILABLE_ELEVENLABS_VOICES.map((voice) => (
+                <option key={voice.id} value={voice.id}>
+                  {voice.label}
+                </option>
+              ))}
+            </select>
+            <label className="text-[11px] font-medium text-rose/70">
+              Speed
+            </label>
+            <select
+              value={playbackRate}
+              onChange={(e) => setPlaybackRate(Number(e.target.value))}
+              className="rounded-md border border-rose/20 bg-rose/10 px-2 py-1 text-[11px] text-foreground outline-none transition-colors hover:border-rose/40 hover:bg-rose/15 focus:border-rose/60"
+            >
+              {PLAYBACK_RATE_OPTIONS.map((rate) => (
+                <option key={rate} value={rate}>
+                  {rate}x
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setAutoPlayVoice((prev) => !prev)}
+              className={`inline-flex items-center gap-2 rounded-md border px-2 py-1 text-[11px] transition-colors ${
+                autoPlayVoice
+                  ? "border-rose/40 bg-rose/20 text-rose"
+                  : "border-rose/20 bg-rose/10 text-rose/60 hover:border-rose/40 hover:bg-rose/15 hover:text-rose/80"
+              }`}
+              aria-pressed={autoPlayVoice}
+              title="Auto-play assistant voice"
+            >
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${
+                  autoPlayVoice ? "bg-rose" : "bg-rose/40"
+                }`}
+              />
+              Auto-play
+            </button>
           </div>
         </div>
       </div>
 
       {/* Chat area */}
       <div className="flex-1 overflow-y-auto rounded-2xl border border-white/5 bg-gradient-to-b from-card/80 to-background">
-        {messages.length === 0 ? (
+        {showPromptStarters ? (
           <div className="flex h-full flex-col items-center justify-center p-8">
-            {/* Welcome message */}
             <div className="mb-8 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-rose/20 bg-gradient-to-br from-rose/10 to-pink-500/5">
-                <svg
-                  className="h-8 w-8 text-rose"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-                  />
+                <svg className="h-8 w-8 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
                 </svg>
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground">
@@ -301,13 +479,11 @@ export default function ChatPanel({ workspaceId, onSendMessage }: Props) {
                 identify and implement practical AI opportunities.
               </p>
             </div>
-
-            {/* Prompt starters grid */}
             <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-2">
               {PROMPT_STARTERS.map((prompt) => (
                 <button
                   key={prompt.text}
-                  onClick={() => handlePromptClick(prompt.text)}
+                  onClick={() => handleSend(prompt.text)}
                   className="group flex items-start gap-3 rounded-xl border border-white/5 bg-muted/20 p-4 text-left transition-all hover:border-rose/30 hover:bg-muted/40"
                 >
                   <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-muted/50 text-muted-foreground transition-colors group-hover:border-rose/30 group-hover:text-rose">
@@ -327,127 +503,200 @@ export default function ChatPanel({ workspaceId, onSendMessage }: Props) {
           </div>
         ) : (
           <div className="space-y-6 p-6">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
+            {messages.map((msg) => {
+              const modelLabel =
+                msg.role === "assistant" && msg.metadata?.modelId
+                  ? AVAILABLE_MODELS.find((m) => m.id === (msg.metadata as { modelId?: string }).modelId)?.label
+                  : undefined;
+
+              return (
                 <div
-                  className={`flex max-w-[85%] gap-3 ${
-                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
-                  }`}
+                  key={msg._id}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  {/* Avatar */}
                   <div
-                    className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
-                      msg.role === "user"
-                        ? "bg-gradient-to-br from-rose to-pink-500"
-                        : "border border-white/10 bg-muted/50"
+                    className={`flex max-w-[85%] gap-3 ${
+                      msg.role === "user" ? "flex-row-reverse" : "flex-row"
                     }`}
                   >
-                    {msg.role === "user" ? (
-                      <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                      </svg>
-                    )}
-                  </div>
-
-                  {/* Message bubble */}
-                  <div className="flex flex-col gap-1">
+                    {/* Avatar */}
                     <div
-                      className={`rounded-2xl px-4 py-3 ${
+                      className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
                         msg.role === "user"
-                          ? "bg-gradient-to-r from-rose to-pink-500 text-white"
-                          : "border border-white/5 bg-muted/30"
+                          ? "bg-gradient-to-br from-rose to-pink-500"
+                          : "border border-white/10 bg-muted/50"
                       }`}
                     >
-                      {msg.isTyping ? (
-                        <div className="flex items-center gap-1 py-1">
-                          <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
-                          <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
-                          <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
-                        </div>
+                      {msg.role === "user" ? (
+                        <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
                       ) : (
-                        <div
-                          className={`prose prose-sm max-w-none ${
-                            msg.role === "user"
-                              ? "prose-invert"
-                              : "prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-strong:text-foreground prose-li:text-foreground/90"
-                          }`}
-                        >
-                          {msg.content.split("\n").map((line, i) => {
-                            if (line.startsWith("**") && line.endsWith("**")) {
-                              return (
-                                <p key={i} className="mb-2 font-semibold">
-                                  {line.replace(/\*\*/g, "")}
-                                </p>
-                              );
-                            }
-                            if (line.startsWith("*") && line.endsWith("*")) {
-                              return (
-                                <p key={i} className="mb-1 italic text-muted-foreground">
-                                  {line.replace(/\*/g, "")}
-                                </p>
-                              );
-                            }
-                            if (line.startsWith("- ")) {
-                              return (
-                                <p key={i} className="mb-1 pl-3">
-                                  <span className="mr-2 text-rose">-</span>
-                                  {line.substring(2)}
-                                </p>
-                              );
-                            }
-                            if (line === "") return <br key={i} />;
-                            return <p key={i} className="mb-2">{line}</p>;
-                          })}
-                        </div>
+                        <svg className="h-4 w-4 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                        </svg>
                       )}
                     </div>
-                    <span
-                      className={`text-[10px] text-muted-foreground ${
-                        msg.role === "user" ? "text-right" : "text-left"
-                      }`}
-                    >
-                      {formatTime(msg.timestamp)}
-                    </span>
+
+                    {/* Message bubble */}
+                    <div className="flex flex-col gap-1">
+                      <div
+                        className={`rounded-2xl px-4 py-3 ${
+                          msg.role === "user"
+                            ? "bg-gradient-to-r from-rose to-pink-500 text-white"
+                            : "border border-white/5 bg-muted/30"
+                        }`}
+                      >
+                        <MessageContent content={msg.content} role={msg.role} />
+                      </div>
+                      <div
+                        className={`flex items-center gap-2 text-[10px] text-muted-foreground ${
+                          msg.role === "user" ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        {msg.role === "assistant" && (
+                          <button
+                            type="button"
+                            onClick={() => handlePlayVoice(msg._id, msg.content)}
+                            disabled={loadingVoiceMessageId === msg._id}
+                            className="inline-flex items-center gap-1 rounded border border-white/10 bg-white/5 px-1.5 py-0.5 transition-colors hover:border-rose/30 hover:text-foreground disabled:opacity-60"
+                            aria-label={
+                              playingMessageId === msg._id
+                                ? "Stop voice playback"
+                                : "Listen to response"
+                            }
+                            title={
+                              playingMessageId === msg._id
+                                ? "Stop voice playback"
+                                : "Listen to response"
+                            }
+                          >
+                            {loadingVoiceMessageId === msg._id ? (
+                              <svg className="h-3 w-3 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                              </svg>
+                            ) : playingMessageId === msg._id ? (
+                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5.75 4A1.75 1.75 0 004 5.75v8.5C4 15.216 4.784 16 5.75 16h.5c.966 0 1.75-.784 1.75-1.75v-8.5C8 4.784 7.216 4 6.25 4h-.5zm8 0A1.75 1.75 0 0012 5.75v8.5c0 .966.784 1.75 1.75 1.75h.5c.966 0 1.75-.784 1.75-1.75v-8.5A1.75 1.75 0 0014.25 4h-.5z" />
+                              </svg>
+                            ) : (
+                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M6.3 4.84A1 1 0 005 5.73v8.54a1 1 0 001.52.857l6.79-4.27a1 1 0 000-1.694L6.3 4.84z" />
+                              </svg>
+                            )}
+                            <span>
+                              {playingMessageId === msg._id ? "Stop" : "Listen"}
+                            </span>
+                          </button>
+                        )}
+                        <span>{formatTime(msg.createdAt)}</span>
+                        {modelLabel && (
+                          <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5">
+                            {modelLabel}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Typing indicator */}
+            {typingIndicator && (
+              <div className="flex justify-start">
+                <div className="flex max-w-[85%] gap-3">
+                  <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-muted/50">
+                    <svg className="h-4 w-4 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                  </div>
+                  <div className="rounded-2xl border border-white/5 bg-muted/30 px-4 py-3">
+                    <div className="flex items-center gap-1 py-1">
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+                      <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground" />
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
+            )}
+
             <div ref={messagesEndRef} />
           </div>
         )}
       </div>
 
+      {/* Error banner */}
+      {(error || voiceError || voiceInputError) && (
+        <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2">
+          <p className="flex-1 text-sm text-red-400">
+            {error || voiceError || voiceInputError}
+          </p>
+          <button
+            onClick={() => {
+              setError(null);
+              setVoiceError(null);
+            }}
+            className="text-xs text-red-400/60 hover:text-red-400"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
       {/* Input area */}
-      <div className="mt-4">
+      <div className="mt-4 space-y-2">
         <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-card/50 p-2 transition-all focus-within:border-rose/50 focus-within:ring-2 focus-within:ring-rose/20">
-          <div className="flex items-center gap-2 border-r border-white/10 pr-3">
-            <button
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-              title="Attach file"
+          {/* Compact model selector inside the input bar */}
+          <div className="flex items-center gap-1.5 border-r border-white/10 pr-2">
+            <svg className="h-4 w-4 flex-shrink-0 text-rose" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+            <select
+              value={selectedModelId}
+              onChange={(e) => setSelectedModelId(e.target.value)}
+              className="w-36 cursor-pointer appearance-none rounded-md border border-white/15 bg-muted/40 px-2 py-1.5 text-[11px] font-medium text-foreground outline-none transition-colors hover:border-rose/40 focus:border-rose/50"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
-              </svg>
-            </button>
+              {AVAILABLE_MODELS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
           </div>
+
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about AI opportunities for your team..."
+            placeholder="Ask about AI opportunities..."
             disabled={isLoading}
             className="flex-1 bg-transparent px-2 py-2 text-sm text-foreground placeholder-muted-foreground outline-none disabled:opacity-50"
           />
+          {voiceInputSupported && (
+            <button
+              type="button"
+              onClick={handleVoiceInput}
+              disabled={isLoading}
+              className={`flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 transition-all ${
+                isListening
+                  ? "bg-rose/20 text-rose"
+                  : "bg-white/5 text-muted-foreground hover:border-rose/30 hover:text-foreground"
+              } disabled:opacity-50`}
+              aria-label={isListening ? "Stop voice input" : "Start voice input"}
+              title={isListening ? "Stop voice input" : "Start voice input"}
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-12 0v1.5a6 6 0 006 6m0 0v3m-3.75 0h7.5M12 15a3 3 0 003-3V6.75a3 3 0 10-6 0V12a3 3 0 003 3z" />
+              </svg>
+            </button>
+          )}
           <button
+            type="button"
             onClick={() => handleSend()}
             disabled={!inputValue.trim() || isLoading}
             className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-rose to-pink-500 text-white shadow-lg shadow-rose/20 transition-all hover:brightness-110 disabled:opacity-50 disabled:shadow-none"
@@ -464,12 +713,16 @@ export default function ChatPanel({ workspaceId, onSendMessage }: Props) {
             )}
           </button>
         </div>
-        <div className="mt-3 flex items-center justify-between px-1">
+        <div className="flex items-center justify-between px-1">
           <p className="text-xs text-muted-foreground">
-            Press Enter to send, Shift+Enter for new line
+            {voiceInputSupported
+              ? isListening
+                ? "Listening... speak naturally"
+                : "Enter to send or use the mic"
+              : "Enter to send"}
           </p>
           <p className="text-xs text-muted-foreground">
-            AI responses are for guidance only
+            Voice playback is available for assistant replies
           </p>
         </div>
       </div>
