@@ -1,8 +1,8 @@
-# ZestLearn Master Cursor Prompt Pack
+# Cellvara Master Cursor Prompt Pack
 
 ## 1. How to Use This Document
 
-This document contains a complete master prompt pack for building the ZestLearn MVP inside Cursor.
+This document contains a complete master prompt pack for building the Cellvara MVP inside Cursor.
 
 It is designed so you can:
 
@@ -12,7 +12,7 @@ It is designed so you can:
 * avoid over-engineering,
 * move fast while preserving clarity.
 
-Each prompt is written to reflect the ZestLearn MVP scope:
+Each prompt is written to reflect the Cellvara MVP scope:
 
 * AI consultant copilot for pharma and biotech SMEs,
 * assessment-driven onboarding,
@@ -29,9 +29,9 @@ Each prompt is written to reflect the ZestLearn MVP scope:
 Paste this first before prompting Cursor for individual modules.
 
 ```text
-You are helping me build an MVP called ZestLearn.
+You are helping me build an MVP called Cellvara.
 
-ZestLearn is an AI consultant copilot for pharma and biotech SMEs. The user should be able to:
+Cellvara is an AI consultant copilot for pharma and biotech SMEs. The user should be able to:
 1. visit a landing page,
 2. complete an onboarding assessment,
 3. create a workspace,
@@ -141,10 +141,10 @@ Also improve error handling so the issue fails gracefully if it happens again.
 Use this first for codebase setup.
 
 ```text
-Create the initial codebase structure for a Next.js 14 + TypeScript + Tailwind MVP called ZestLearn.
+Create the initial codebase structure for a Next.js 14 + TypeScript + Tailwind MVP called Cellvara.
 
 Product:
-ZestLearn is an AI consultant copilot for pharma and biotech SMEs.
+Cellvara is an AI consultant copilot for pharma and biotech SMEs.
 The user journey is:
 - landing page
 - assessment form
@@ -181,7 +181,7 @@ Keep it clean and MVP-friendly.
 ## 7. README Prompt
 
 ```text
-Create a clear README.md for the ZestLearn MVP.
+Create a clear README.md for the Cellvara MVP.
 Include:
 - product overview,
 - target users,
@@ -201,7 +201,7 @@ Write it in a professional startup/engineering style.
 ## 8. Environment Variables Prompt
 
 ```text
-Generate a `.env.example` file for the ZestLearn MVP.
+Generate a `.env.example` file for the Cellvara MVP.
 Include variables for:
 - NEXT_PUBLIC_CONVEX_URL
 - CONVEX_DEPLOYMENT
@@ -219,7 +219,7 @@ Also add short inline comments describing what each variable is used for.
 ## 9.1 Landing Page Assembly Prompt
 
 ```text
-Build the ZestLearn landing page in `app/page.tsx` using modular React components.
+Build the Cellvara landing page in `app/page.tsx` using modular React components.
 Use these sections:
 - Hero
 - How It Works
@@ -236,9 +236,9 @@ Use Tailwind and keep the code clean.
 ## 9.2 Hero Component Prompt
 
 ```text
-Create a Hero component for ZestLearn.
+Create a Hero component for Cellvara.
 Headline idea: “Find the best AI pilot for your pharma or biotech team.”
-Subheadline should explain that ZestLearn analyzes business context, documents, and pain points to recommend practical AI use cases and a roadmap.
+Subheadline should explain that Cellvara analyzes business context, documents, and pain points to recommend practical AI use cases and a roadmap.
 Include a prominent CTA button linking to /assessment.
 The design should feel premium, modern, and SaaS-like.
 ```
@@ -246,7 +246,7 @@ The design should feel premium, modern, and SaaS-like.
 ## 9.3 How It Works Prompt
 
 ```text
-Create a “How It Works” section for ZestLearn with 4 simple steps:
+Create a “How It Works” section for Cellvara with 4 simple steps:
 1. Tell us about your team and bottleneck
 2. Upload internal context
 3. Chat with the AI consultant
@@ -258,16 +258,16 @@ Keep the copy concise and B2B-friendly.
 ## 9.4 Target Audience Prompt
 
 ```text
-Create a Target Audience section for ZestLearn.
+Create a Target Audience section for Cellvara.
 Focus on users like innovation managers, digital transformation leads, operations managers, and R&D/process leads at pharma and biotech SMEs.
-Explain their pain points and why ZestLearn helps them.
+Explain their pain points and why Cellvara helps them.
 Use a clean card-based layout.
 ```
 
 ## 9.5 Example Outputs Prompt
 
 ```text
-Create an Example Outputs section for the ZestLearn landing page.
+Create an Example Outputs section for the Cellvara landing page.
 Show examples of outputs like:
 - top AI use cases
 - best first pilot
@@ -280,7 +280,7 @@ Make it visually polished and clearly business-oriented.
 ## 9.6 CTA Section Prompt
 
 ```text
-Create a final CTA section for the ZestLearn landing page.
+Create a final CTA section for the Cellvara landing page.
 Main CTA text: “Start Your AI Assessment”.
 Support copy should encourage users to turn a business bottleneck into a practical AI roadmap.
 Use a visually strong section with premium styling.
@@ -293,7 +293,7 @@ Use a visually strong section with premium styling.
 ## 10.1 Assessment Page Prompt
 
 ```text
-Create the assessment page for ZestLearn in `app/assessment/page.tsx`.
+Create the assessment page for Cellvara in `app/assessment/page.tsx`.
 Render a polished onboarding screen with a short intro and the main AssessmentForm component.
 The page should feel focused, guided, and low-friction.
 Use Tailwind and keep the page clean.
@@ -302,7 +302,7 @@ Use Tailwind and keep the page clean.
 ## 10.2 Assessment Form Prompt
 
 ```text
-Build `components/assessment/AssessmentForm.tsx` for ZestLearn.
+Build `components/assessment/AssessmentForm.tsx` for Cellvara.
 This is a single-page structured onboarding form with these fields:
 - companyName
 - companyType
@@ -330,7 +330,7 @@ Design should feel polished and SaaS-like.
 ## 10.3 Assessment Validation Prompt
 
 ```text
-Create `lib/validation/assessment.ts` for ZestLearn.
+Create `lib/validation/assessment.ts` for Cellvara.
 Add a validation function for the assessment form input.
 Return a structured object containing:
 - whether the input is valid,
@@ -342,7 +342,7 @@ Keep it simple and robust for MVP use.
 ## 10.4 Assessment Types Prompt
 
 ```text
-Create `types/assessment.ts` for the ZestLearn MVP.
+Create `types/assessment.ts` for the Cellvara MVP.
 Define TypeScript interfaces and types for:
 - AssessmentInput
 - AssessmentValidationErrors
@@ -357,7 +357,7 @@ Use clean, reusable types.
 ## 11.1 Convex Schema Prompt
 
 ```text
-Create `convex/schema.ts` for the ZestLearn MVP.
+Create `convex/schema.ts` for the Cellvara MVP.
 Define Convex tables for:
 - users
 - workspaces
@@ -368,7 +368,7 @@ Define Convex tables for:
 - memoryPatterns
 - events
 
-Use appropriate fields for the ZestLearn product:
+Use appropriate fields for the Cellvara product:
 workspace profile, assessment data, document summaries, chat history, structured report JSON, memory patterns, and event logs.
 Add useful indexes where appropriate, especially by workspaceId.
 Use TypeScript and Convex values.
@@ -377,7 +377,7 @@ Use TypeScript and Convex values.
 ## 11.2 Workspaces Backend Prompt
 
 ```text
-Create `convex/workspaces.ts` for the ZestLearn MVP.
+Create `convex/workspaces.ts` for the Cellvara MVP.
 Implement functions for:
 - createWorkspace
 - getWorkspaceById
@@ -390,7 +390,7 @@ Keep the code clean and domain-focused.
 ## 11.3 Assessments Backend Prompt
 
 ```text
-Create `convex/assessments.ts` for the ZestLearn MVP.
+Create `convex/assessments.ts` for the Cellvara MVP.
 Implement functions for:
 - submitAssessment
 - getAssessmentByWorkspaceId
@@ -403,7 +403,7 @@ Use strong typing.
 ## 11.4 Documents Backend Prompt
 
 ```text
-Create `convex/documents.ts` for the ZestLearn MVP.
+Create `convex/documents.ts` for the Cellvara MVP.
 Implement functions for:
 - createDocumentRecord
 - updateDocumentProcessingStatus
@@ -416,7 +416,7 @@ Document records should support fileName, fileType, storagePath, extractedText, 
 ## 11.5 Chat Backend Prompt
 
 ```text
-Create `convex/chat.ts` for the ZestLearn MVP.
+Create `convex/chat.ts` for the Cellvara MVP.
 Implement functions for:
 - createChatMessage
 - listRecentMessagesByWorkspace
@@ -428,7 +428,7 @@ Store role, content, optional metadata, workspaceId, and createdAt.
 ## 11.6 Reports Backend Prompt
 
 ```text
-Create `convex/reports.ts` for the ZestLearn MVP.
+Create `convex/reports.ts` for the Cellvara MVP.
 Implement functions for:
 - createReportRecord
 - getLatestReportByWorkspace
@@ -440,7 +440,7 @@ Reports should store structuredJson, renderedMarkdown, title, workspaceId, and c
 ## 11.7 Memory Backend Prompt
 
 ```text
-Create `convex/memory.ts` for the ZestLearn MVP.
+Create `convex/memory.ts` for the Cellvara MVP.
 Implement functions for:
 - saveMemoryPattern
 - listRelevantMemoryPatterns
@@ -452,7 +452,7 @@ Keep retrieval simple and practical for MVP use.
 ## 11.8 Events Backend Prompt
 
 ```text
-Create `convex/events.ts` for the ZestLearn MVP.
+Create `convex/events.ts` for the Cellvara MVP.
 Implement a small event logging helper and query functions if useful.
 Event types should include things like assessment_submitted, document_uploaded, chat_message_sent, report_generated, and memory_pattern_saved.
 Keep it lightweight.
@@ -465,7 +465,7 @@ Keep it lightweight.
 ## 12.1 Workspace Page Prompt
 
 ```text
-Build `app/workspace/[workspaceId]/page.tsx` for ZestLearn.
+Build `app/workspace/[workspaceId]/page.tsx` for Cellvara.
 This page should fetch workspace dashboard data and render a reusable WorkspaceShell component.
 Handle loading and error states cleanly.
 Keep route-level logic thin.
@@ -474,7 +474,7 @@ Keep route-level logic thin.
 ## 12.2 Workspace Shell Prompt
 
 ```text
-Build `components/workspace/WorkspaceShell.tsx` for ZestLearn.
+Build `components/workspace/WorkspaceShell.tsx` for Cellvara.
 It should provide a modern responsive dashboard layout with sections or tabs for:
 - Overview
 - Documents
@@ -488,7 +488,7 @@ The layout should feel like a modern B2B SaaS workspace.
 ## 12.3 Overview Panel Prompt
 
 ```text
-Create `components/workspace/OverviewPanel.tsx` for ZestLearn.
+Create `components/workspace/OverviewPanel.tsx` for Cellvara.
 Display the workspace profile and assessment summary.
 Show fields like company type, company size, role, department, AI maturity, bottleneck, and desired outcome.
 Use a clean card-based layout.
@@ -497,7 +497,7 @@ Use a clean card-based layout.
 ## 12.4 Documents Panel Prompt
 
 ```text
-Create `components/workspace/DocumentsPanel.tsx` for ZestLearn.
+Create `components/workspace/DocumentsPanel.tsx` for Cellvara.
 This panel should include:
 - upload section,
 - list of document cards,
@@ -509,7 +509,7 @@ Keep the panel modular and polished.
 ## 12.5 Chat Panel Prompt
 
 ```text
-Create `components/workspace/ChatPanel.tsx` for ZestLearn.
+Create `components/workspace/ChatPanel.tsx` for Cellvara.
 This panel should render the consultant chat UI including message list, input, and prompt starters.
 It should feel conversational but professional.
 ```
@@ -517,7 +517,7 @@ It should feel conversational but professional.
 ## 12.6 Reports Panel Prompt
 
 ```text
-Create `components/workspace/ReportsPanel.tsx` for ZestLearn.
+Create `components/workspace/ReportsPanel.tsx` for Cellvara.
 This panel should display the latest report summary and include a Generate Report button.
 If a report exists, show a preview card and link to the full report page.
 ```
@@ -525,7 +525,7 @@ If a report exists, show a preview card and link to the full report page.
 ## 12.7 Insights Panel Prompt
 
 ```text
-Create `components/workspace/InsightsPanel.tsx` for ZestLearn.
+Create `components/workspace/InsightsPanel.tsx` for Cellvara.
 This panel should display reusable memory insights as cards.
 Examples include common blockers, similar team patterns, and suggested first pilots.
 The design should make the collective memory layer feel tangible.
@@ -538,7 +538,7 @@ The design should make the collective memory layer feel tangible.
 ## 13.1 Upload Dropzone Prompt
 
 ```text
-Create `components/documents/UploadDropzone.tsx` for ZestLearn.
+Create `components/documents/UploadDropzone.tsx` for Cellvara.
 It should support drag-and-drop and file picker upload.
 Accept at least PDF and TXT for MVP.
 Expose an `onUpload` callback.
@@ -549,7 +549,7 @@ Design should be clean and modern.
 ## 13.2 Document Card Prompt
 
 ```text
-Create `components/documents/DocumentCard.tsx` for ZestLearn.
+Create `components/documents/DocumentCard.tsx` for Cellvara.
 Display:
 - file name,
 - file type,
@@ -562,7 +562,7 @@ Use a clean card design suitable for a SaaS dashboard.
 ## 13.3 Processing Badge Prompt
 
 ```text
-Create `components/documents/ProcessingStatusBadge.tsx` for ZestLearn.
+Create `components/documents/ProcessingStatusBadge.tsx` for Cellvara.
 It should render clear status styles for: uploaded, processing, done, error.
 Keep it simple and reusable.
 ```
@@ -570,7 +570,7 @@ Keep it simple and reusable.
 ## 13.4 Upload Route Prompt
 
 ```text
-Create `app/api/upload/route.ts` for ZestLearn.
+Create `app/api/upload/route.ts` for Cellvara.
 This route should:
 - accept multipart form data with workspaceId and file,
 - validate supported file types,
@@ -588,7 +588,7 @@ Do not over-engineer storage. If needed, stub file storage simply and focus on t
 ## 13.5 Text Extraction Prompt
 
 ```text
-Create `lib/documents/extractText.ts` for ZestLearn.
+Create `lib/documents/extractText.ts` for Cellvara.
 Implement a simple document text extraction utility.
 Prioritize support for TXT and PDF.
 If PDF parsing is limited, implement a clean fallback structure and return controlled errors.
@@ -598,7 +598,7 @@ The function should be reusable by the upload route.
 ## 13.6 Summarize Document Prompt
 
 ```text
-Create `lib/documents/summarizeDocument.ts` for ZestLearn.
+Create `lib/documents/summarizeDocument.ts` for Cellvara.
 This helper should call the AI provider to summarize extracted document text.
 Return:
 - summary,
@@ -610,7 +610,7 @@ The summary should be concise but useful for downstream chat and report generati
 ## 13.7 Tag Document Prompt
 
 ```text
-Create `lib/documents/tagDocument.ts` for ZestLearn.
+Create `lib/documents/tagDocument.ts` for Cellvara.
 Implement a lightweight utility that classifies document summaries into tags such as:
 - process
 - compliance
@@ -631,7 +631,7 @@ Keep it simple for MVP.
 ## 14.1 Gemini Provider Prompt
 
 ```text
-Create `lib/ai/providers/gemini.ts` for ZestLearn.
+Create `lib/ai/providers/gemini.ts` for Cellvara.
 Implement a Gemini provider wrapper in TypeScript with methods:
 - generateText
 - generateStructured
@@ -649,7 +649,7 @@ Add basic error handling.
 ## 14.2 Featherless Provider Prompt
 
 ```text
-Create `lib/ai/providers/featherless.ts` for ZestLearn.
+Create `lib/ai/providers/featherless.ts` for Cellvara.
 Implement the same interface as the Gemini provider so it can be used as an optional fallback provider.
 Keep the structure parallel and reusable.
 ```
@@ -657,7 +657,7 @@ Keep the structure parallel and reusable.
 ## 14.3 System Prompt File Prompt
 
 ```text
-Create `lib/ai/prompts/system.ts` for ZestLearn.
+Create `lib/ai/prompts/system.ts` for Cellvara.
 Define the core system prompt that frames the model as an AI transformation consultant for pharma and biotech SMEs.
 The system should prioritize practical, realistic, low-risk AI recommendations and clearly state assumptions when information is missing.
 Export reusable prompt constants or builder functions.
@@ -666,7 +666,7 @@ Export reusable prompt constants or builder functions.
 ## 14.4 Chat Prompt Prompt
 
 ```text
-Create `lib/ai/prompts/chat.ts` for ZestLearn.
+Create `lib/ai/prompts/chat.ts` for Cellvara.
 Build a chat prompt generator that uses:
 - workspace profile,
 - assessment data,
@@ -680,7 +680,7 @@ Return a prompt string or structured prompt object.
 ## 14.5 Summary Prompt Prompt
 
 ```text
-Create `lib/ai/prompts/summarize.ts` for ZestLearn.
+Create `lib/ai/prompts/summarize.ts` for Cellvara.
 Define a prompt used to summarize uploaded documents into concise structured context for later retrieval.
 The output should help identify relevant workflows, pain points, systems, compliance context, and data context where possible.
 ```
@@ -688,7 +688,7 @@ The output should help identify relevant workflows, pain points, systems, compli
 ## 14.6 Report Prompt Prompt
 
 ```text
-Create `lib/ai/prompts/report.ts` for ZestLearn.
+Create `lib/ai/prompts/report.ts` for Cellvara.
 Build a report generation prompt that asks the model to return strict JSON for an AI opportunity report.
 Required sections:
 - problem_summary
@@ -703,7 +703,7 @@ The prompt should emphasize realistic AI use cases for pharma and biotech SMEs a
 ## 14.7 Memory Prompt Prompt
 
 ```text
-Create `lib/ai/prompts/memory.ts` for ZestLearn.
+Create `lib/ai/prompts/memory.ts` for Cellvara.
 Define a prompt that extracts short reusable patterns from reports or chat outputs.
 Examples: common blockers, recommended first pilots, risk insights, implementation advice.
 The output should be concise and reusable in later chats.
@@ -716,7 +716,7 @@ The output should be concise and reusable in later chats.
 ## 15.1 Build Chat Context Prompt
 
 ```text
-Create `lib/ai/context/buildChatContext.ts` for ZestLearn.
+Create `lib/ai/context/buildChatContext.ts` for Cellvara.
 Build helper functions that convert workspace profile, assessment, document summaries, recent messages, and memory patterns into compact prompt-ready text blocks.
 The goal is to keep context concise, relevant, and structured.
 Do not dump raw database objects directly into prompts.
@@ -725,7 +725,7 @@ Do not dump raw database objects directly into prompts.
 ## 15.2 Build Report Context Prompt
 
 ```text
-Create `lib/ai/context/buildReportContext.ts` for ZestLearn.
+Create `lib/ai/context/buildReportContext.ts` for Cellvara.
 Build a helper that assembles the best available context for report generation from:
 - workspace profile,
 - assessment,
@@ -738,7 +738,7 @@ The output should be deterministic and prompt-ready.
 ## 15.3 Build Memory Context Prompt
 
 ```text
-Create `lib/ai/context/buildMemoryContext.ts` for ZestLearn.
+Create `lib/ai/context/buildMemoryContext.ts` for Cellvara.
 Build a small helper that formats report/chat outputs into input for memory extraction.
 Keep it simple and reusable.
 ```
@@ -750,7 +750,7 @@ Keep it simple and reusable.
 ## 16.1 Chat Route Prompt
 
 ```text
-Create `app/api/chat/route.ts` for ZestLearn.
+Create `app/api/chat/route.ts` for Cellvara.
 This route should:
 - accept workspaceId and message,
 - validate input,
@@ -767,7 +767,7 @@ Keep the route handler thin and move reusable logic into lib helpers where appro
 ## 16.2 Chat Window Prompt
 
 ```text
-Create `components/chat/ChatWindow.tsx` for ZestLearn.
+Create `components/chat/ChatWindow.tsx` for Cellvara.
 Render a scrollable message list with user and assistant messages.
 Use a polished conversational UI suitable for a B2B AI assistant.
 Keep the component reusable and presentation-focused.
@@ -776,7 +776,7 @@ Keep the component reusable and presentation-focused.
 ## 16.3 Chat Input Prompt
 
 ```text
-Create `components/chat/ChatInput.tsx` for ZestLearn.
+Create `components/chat/ChatInput.tsx` for Cellvara.
 It should include a textarea or input, submit button, enter-to-send behavior where appropriate, and loading state.
 Expose a clean onSend callback.
 ```
@@ -784,7 +784,7 @@ Expose a clean onSend callback.
 ## 16.4 Chat Message Prompt
 
 ```text
-Create `components/chat/ChatMessage.tsx` for ZestLearn.
+Create `components/chat/ChatMessage.tsx` for Cellvara.
 Render a message bubble for either user or assistant.
 Style them differently but consistently.
 Keep the visual style clean and professional.
@@ -793,7 +793,7 @@ Keep the visual style clean and professional.
 ## 16.5 Prompt Starters Prompt
 
 ```text
-Create `components/chat/PromptStarters.tsx` for ZestLearn.
+Create `components/chat/PromptStarters.tsx` for Cellvara.
 Include buttons for prompts like:
 - Find AI use cases
 - Assess feasibility
@@ -810,7 +810,7 @@ The component should be reusable and easy to style.
 ## 17.1 Report Route Prompt
 
 ```text
-Create `app/api/report/route.ts` for ZestLearn.
+Create `app/api/report/route.ts` for Cellvara.
 This route should:
 - accept workspaceId,
 - gather workspace profile, assessment, document summaries, recent chat context, and memory patterns,
@@ -827,7 +827,7 @@ Keep the route clean and modular.
 ## 17.2 Report Generator Prompt
 
 ```text
-Create `lib/reports/generateReport.ts` for ZestLearn.
+Create `lib/reports/generateReport.ts` for Cellvara.
 This helper should:
 - accept assembled report context,
 - call the AI provider,
@@ -840,7 +840,7 @@ Use clean TypeScript types and defensive parsing.
 ## 17.3 Report Parser Prompt
 
 ```text
-Create `lib/ai/parsers/reportParser.ts` for ZestLearn.
+Create `lib/ai/parsers/reportParser.ts` for Cellvara.
 Implement a parser/validator for the structured report format.
 It should verify that required sections exist and normalize missing optional values safely.
 Keep it practical for MVP use.
@@ -849,7 +849,7 @@ Keep it practical for MVP use.
 ## 17.4 Markdown Renderer Prompt
 
 ```text
-Create `lib/reports/renderMarkdown.ts` for ZestLearn.
+Create `lib/reports/renderMarkdown.ts` for Cellvara.
 Convert the structured report object into a deterministic markdown string.
 Do not rely on the model to generate final markdown.
 Use the report structure to build a clean readable report with headings and bullet points where useful.
@@ -858,7 +858,7 @@ Use the report structure to build a clean readable report with headings and bull
 ## 17.5 Report View Prompt
 
 ```text
-Create `components/report/ReportView.tsx` for ZestLearn.
+Create `components/report/ReportView.tsx` for Cellvara.
 Render a polished report screen using a structured report object.
 Display sections for:
 - Problem Summary
@@ -873,7 +873,7 @@ Use cards and clear hierarchy.
 ## 17.6 Use Case Card Prompt
 
 ```text
-Create `components/report/UseCaseCard.tsx` for ZestLearn.
+Create `components/report/UseCaseCard.tsx` for Cellvara.
 Show a recommended AI use case with title, description, business value, difficulty, data requirements, risks, and priority score.
 Use a polished card design.
 ```
@@ -881,7 +881,7 @@ Use a polished card design.
 ## 17.7 Roadmap Section Prompt
 
 ```text
-Create `components/report/RoadmapSection.tsx` for ZestLearn.
+Create `components/report/RoadmapSection.tsx` for Cellvara.
 Display the 30/60/90 day roadmap in a clear multi-column or stacked layout.
 Make it visually easy to scan.
 ```
@@ -889,7 +889,7 @@ Make it visually easy to scan.
 ## 17.8 Risk Section Prompt
 
 ```text
-Create `components/report/RiskSection.tsx` for ZestLearn.
+Create `components/report/RiskSection.tsx` for Cellvara.
 Display risk and compliance considerations cleanly.
 If risk data is distributed inside use cases, provide a sensible aggregated display approach.
 ```
@@ -901,7 +901,7 @@ If risk data is distributed inside use cases, provide a sensible aggregated disp
 ## 18.1 Memory Extraction Prompt
 
 ```text
-Create `lib/reports/extractInsights.ts` for ZestLearn.
+Create `lib/reports/extractInsights.ts` for Cellvara.
 This helper should extract short reusable insights from a structured report, such as:
 - common blockers,
 - recommended first pilots,
@@ -913,7 +913,7 @@ Return normalized memory pattern objects that can be saved in the database.
 ## 18.2 Save Patterns Prompt
 
 ```text
-Create `lib/memory/savePatterns.ts` for ZestLearn.
+Create `lib/memory/savePatterns.ts` for Cellvara.
 Implement a small helper that accepts extracted memory patterns and persists them using backend calls.
 Keep it simple and reusable.
 ```
@@ -921,7 +921,7 @@ Keep it simple and reusable.
 ## 18.3 Retrieve Patterns Prompt
 
 ```text
-Create `lib/memory/retrievePatterns.ts` for ZestLearn.
+Create `lib/memory/retrievePatterns.ts` for Cellvara.
 Implement a helper to fetch relevant memory patterns for a workspace and optionally combine workspace-specific and shared patterns.
 Keep ranking/filtering logic simple.
 ```
@@ -929,7 +929,7 @@ Keep ranking/filtering logic simple.
 ## 18.4 Normalize Pattern Prompt
 
 ```text
-Create `lib/memory/normalizePattern.ts` for ZestLearn.
+Create `lib/memory/normalizePattern.ts` for Cellvara.
 Implement a utility that ensures memory patterns have consistent categories, text formatting, and metadata before storing them.
 ```
 
@@ -940,7 +940,7 @@ Implement a utility that ensures memory patterns have consistent categories, tex
 ## 19.1 Workspace Types Prompt
 
 ```text
-Create `types/workspace.ts` for ZestLearn.
+Create `types/workspace.ts` for Cellvara.
 Define TypeScript interfaces for workspace profile data and workspace dashboard response data.
 Keep them aligned with the Convex schema and frontend needs.
 ```
@@ -948,21 +948,21 @@ Keep them aligned with the Convex schema and frontend needs.
 ## 19.2 Document Types Prompt
 
 ```text
-Create `types/document.ts` for ZestLearn.
+Create `types/document.ts` for Cellvara.
 Define interfaces for document metadata, document summary, tags, and upload responses.
 ```
 
 ## 19.3 Chat Types Prompt
 
 ```text
-Create `types/chat.ts` for ZestLearn.
+Create `types/chat.ts` for Cellvara.
 Define types for chat messages, chat request payload, chat response payload, and any context usage metadata.
 ```
 
 ## 19.4 Report Types Prompt
 
 ```text
-Create `types/report.ts` for ZestLearn.
+Create `types/report.ts` for Cellvara.
 Define a strongly typed OpportunityReport model including recommended use cases, best first pilot, roadmap, and open questions.
 Also define API response types for report generation.
 ```
@@ -970,14 +970,14 @@ Also define API response types for report generation.
 ## 19.5 Memory Types Prompt
 
 ```text
-Create `types/memory.ts` for ZestLearn.
+Create `types/memory.ts` for Cellvara.
 Define types for memory patterns, insight cards, and relevant memory query responses.
 ```
 
 ## 19.6 API Types Prompt
 
 ```text
-Create `types/api.ts` for ZestLearn.
+Create `types/api.ts` for Cellvara.
 Define generic API response types and typed payloads for upload, chat, assessment submission, and report generation.
 Keep them simple and reusable.
 ```
@@ -985,7 +985,7 @@ Keep them simple and reusable.
 ## 19.7 Logger Utility Prompt
 
 ```text
-Create `lib/utils/logger.ts` for ZestLearn.
+Create `lib/utils/logger.ts` for Cellvara.
 Implement a lightweight logger utility suitable for MVP development.
 Support info, warn, and error helpers.
 Keep it minimal and server-safe.
@@ -994,7 +994,7 @@ Keep it minimal and server-safe.
 ## 19.8 Errors Utility Prompt
 
 ```text
-Create `lib/utils/errors.ts` for ZestLearn.
+Create `lib/utils/errors.ts` for Cellvara.
 Implement small helper utilities for normalizing thrown errors into readable API-safe messages.
 Keep it simple.
 ```
@@ -1002,7 +1002,7 @@ Keep it simple.
 ## 19.9 Format Utility Prompt
 
 ```text
-Create `lib/utils/format.ts` for ZestLearn.
+Create `lib/utils/format.ts` for Cellvara.
 Add small formatting helpers that may be useful for labels, dates, titles, and string cleanup in the UI.
 Keep the file minimal.
 ```
@@ -1012,7 +1012,7 @@ Keep the file minimal.
 ## 20. Report Page Prompt
 
 ```text
-Build `app/workspace/[workspaceId]/report/page.tsx` for ZestLearn.
+Build `app/workspace/[workspaceId]/report/page.tsx` for Cellvara.
 This page should display the latest generated report for a workspace or a helpful empty state if no report exists yet.
 Use the ReportView component and keep route logic thin.
 ```
@@ -1024,14 +1024,14 @@ Use the ReportView component and keep route logic thin.
 ## 21.1 Spinner Prompt
 
 ```text
-Create `components/shared/Spinner.tsx` for ZestLearn.
+Create `components/shared/Spinner.tsx` for Cellvara.
 Build a small reusable loading spinner with clean styling.
 ```
 
 ## 21.2 Empty State Prompt
 
 ```text
-Create `components/shared/EmptyState.tsx` for ZestLearn.
+Create `components/shared/EmptyState.tsx` for Cellvara.
 Build a reusable empty state component with title, description, and optional action button.
 Use a polished SaaS-style design.
 ```
@@ -1039,7 +1039,7 @@ Use a polished SaaS-style design.
 ## 21.3 Error State Prompt
 
 ```text
-Create `components/shared/ErrorState.tsx` for ZestLearn.
+Create `components/shared/ErrorState.tsx` for Cellvara.
 Build a reusable error state component with title, message, and optional retry action.
 Make it clean and friendly.
 ```
@@ -1051,7 +1051,7 @@ Make it clean and friendly.
 ## 22.1 Webhook Route Prompt
 
 ```text
-Create `app/api/webhook/route.ts` for ZestLearn.
+Create `app/api/webhook/route.ts` for Cellvara.
 This route should support lightweight outgoing or incoming webhook behavior for MVP use.
 It may be used to notify n8n when events like assessment submission or report generation occur.
 Keep it simple and secure enough for an MVP.
@@ -1080,7 +1080,7 @@ Keep it non-blocking and failure-safe.
 ## 23.1 Loading State Polish Prompt
 
 ```text
-Improve all major async flows in the ZestLearn MVP by adding clear loading states for:
+Improve all major async flows in the Cellvara MVP by adding clear loading states for:
 - assessment submission,
 - workspace loading,
 - document processing,
@@ -1092,7 +1092,7 @@ Keep the UI polished and consistent.
 ## 23.2 Empty State Polish Prompt
 
 ```text
-Add polished empty states across the ZestLearn workspace for:
+Add polished empty states across the Cellvara workspace for:
 - no documents uploaded,
 - no chat yet,
 - no report generated yet,
@@ -1103,7 +1103,7 @@ The messaging should feel helpful and product-oriented.
 ## 23.3 Error Handling Polish Prompt
 
 ```text
-Improve error handling across the ZestLearn MVP.
+Improve error handling across the Cellvara MVP.
 Ensure assessment, upload, chat, and report flows fail gracefully with readable messages and no broken UI states.
 Preserve current functionality while improving resilience.
 ```
@@ -1111,7 +1111,7 @@ Preserve current functionality while improving resilience.
 ## 23.4 Demo Data Seed Prompt
 
 ```text
-Add seed data or helper logic for the ZestLearn MVP so the product feels richer during demos.
+Add seed data or helper logic for the Cellvara MVP so the product feels richer during demos.
 Include a few shared memory patterns such as:
 - documentation-heavy teams often begin with summarization and document triage copilots,
 - low AI maturity teams should start with human-in-the-loop copilots,
@@ -1127,7 +1127,7 @@ Keep it easy to remove or replace later.
 Use this if the codebase becomes messy and you need Cursor to realign it.
 
 ```text
-Review the current ZestLearn MVP codebase and align it with this architecture:
+Review the current Cellvara MVP codebase and align it with this architecture:
 - Next.js + TypeScript + Tailwind frontend
 - Convex as source of truth for persistent state
 - lib/ai for provider wrappers, prompts, parsers, and context builders
@@ -1159,4 +1159,4 @@ The MVP succeeds if this loop works convincingly:
 
 **assessment + context -> grounded AI guidance -> structured report -> reusable insight**
 
-That is the heart of ZestLearn.
+That is the heart of Cellvara.

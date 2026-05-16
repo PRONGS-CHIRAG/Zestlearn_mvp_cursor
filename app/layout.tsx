@@ -10,9 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ZestLearn — AI Consultant Copilot for Pharma & Biotech",
+  title: "Cellvara — AI Consultant Copilot for Pharma & Biotech",
   description:
-    "Find the best AI pilot for your pharma or biotech team. ZestLearn analyzes your business context and generates a practical AI opportunity roadmap.",
+    "Find the best AI pilot for your pharma or biotech team. Cellvara analyzes your business context and generates a practical AI opportunity roadmap.",
 };
 
 export default function RootLayout({

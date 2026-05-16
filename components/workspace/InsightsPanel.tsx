@@ -207,7 +207,7 @@ export default function InsightsPanel({ workspaceId, insights = demoInsights }: 
             <div>
               <h3 className="text-lg font-semibold text-foreground">AI-Powered Collective Memory</h3>
               <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-                ZestLearn learns from every assessment and conversation. These insights represent patterns, 
+                Cellvara learns from every assessment and conversation. These insights represent patterns, 
                 blockers, and opportunities discovered across similar pharma and biotech teams.
               </p>
             </div>

@@ -21,14 +21,14 @@ export default function WorkspaceError({
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/images/zestlearn-logo.png"
-              alt="ZestLearn"
+              src="/images/cellvara-logo.png"
+              alt="Cellvara"
               width={40}
               height={40}
               className="h-10 w-10"
             />
             <span className="text-lg font-semibold text-foreground">
-              ZestLearn
+              Cellvara
             </span>
           </Link>
         </div>

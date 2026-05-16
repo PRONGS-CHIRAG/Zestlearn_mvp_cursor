@@ -1,4 +1,4 @@
-# ZestLearn Current Plan
+# Cellvara Current Plan
 
 ## Purpose
 
@@ -13,7 +13,7 @@ If code and plan conflict, the codebase is the source of truth until this file i
 
 ## Product Loop
 
-The core ZestLearn MVP loop is:
+The core Cellvara MVP loop is:
 
 `assessment -> workspace -> document upload -> consultant chat -> report -> memory insight`
 
@@ -34,7 +34,7 @@ The working model for implementation is now a single implementer flow with one a
 
 A user should be able to:
 
-1. land on the ZestLearn homepage,
+1. land on the Cellvara homepage,
 2. click the CTA,
 3. complete the assessment,
 4. submit the form,
@@ -100,9 +100,9 @@ A user should be able to:
 - keep AI logic out of UI files
 - prefer deterministic flows over agentic complexity
 - keep the architecture aligned with:
-  - `zestlearn_context_md.md`
-  - `zestlearn_technical_prd.md`
-  - `zestlearn_system_architecture_and_api_contract.md`
+  - `cellvara_context_md.md`
+  - `cellvara_technical_prd.md`
+  - `cellvara_system_architecture_and_api_contract.md`
 
 ---
 

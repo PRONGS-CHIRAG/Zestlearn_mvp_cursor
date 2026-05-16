@@ -1,4 +1,4 @@
-# ZestLearn Next Task
+# Cellvara Next Task
 
 ## Purpose
 
@@ -28,7 +28,7 @@ Read these first:
 1. `CURRENT_PLAN.md`
 2. `IMPLEMENTATION_STATUS.md`
 3. `DECISIONS.md`
-4. `zestlearn_system_architecture_and_api_contract.md` — section 10.1 (Assessment API Contract) and section 5.1 (Assessment Flow)
+4. `cellvara_system_architecture_and_api_contract.md` — section 10.1 (Assessment API Contract) and section 5.1 (Assessment Flow)
 
 ---
 

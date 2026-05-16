@@ -23,7 +23,7 @@ export default class PanelErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error("[ZestLearn] Panel error:", error, info.componentStack);
+    console.error("[Cellvara] Panel error:", error, info.componentStack);
   }
 
   render() {

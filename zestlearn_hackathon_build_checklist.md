@@ -1,4 +1,4 @@
-# ZestLearn Hackathon Build Checklist
+# Cellvara Hackathon Build Checklist
 
 ## Core Rule
 

@@ -19,7 +19,7 @@ export default async function WorkspacePage({ params }: WorkspacePageProps) {
 export async function generateMetadata({ params }: WorkspacePageProps) {
   const { workspaceId } = await params;
   return {
-    title: `Workspace ${workspaceId} | ZestLearn`,
+    title: `Workspace ${workspaceId} | Cellvara`,
     description: "Your AI assessment workspace dashboard",
   };
 }

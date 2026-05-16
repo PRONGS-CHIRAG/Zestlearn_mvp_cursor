@@ -1,4 +1,4 @@
-# ZestLearn Decisions Log
+# Cellvara Decisions Log
 
 ## Purpose
 
@@ -23,7 +23,7 @@ The MVP should focus on one complete loop:
 
 **Why**
 
-This is the smallest end-to-end workflow that proves the ZestLearn concept.
+This is the smallest end-to-end workflow that proves the Cellvara concept.
 
 **Implication**
 
@@ -49,7 +49,7 @@ The implementation should follow the documented stack:
 
 **Why**
 
-This stack is already defined across the ZestLearn planning documents and supports fast MVP delivery.
+This stack is already defined across the Cellvara planning documents and supports fast MVP delivery.
 
 **Implication**
 
@@ -197,7 +197,7 @@ Once that scaffold exists, implementation should continue sequentially one miles
 
 **Decision**
 
-The current ZestLearn build should assume one person is implementing the codebase, with Codex used for planning and Cursor used for execution.
+The current Cellvara build should assume one person is implementing the codebase, with Codex used for planning and Cursor used for execution.
 
 **Why**
 

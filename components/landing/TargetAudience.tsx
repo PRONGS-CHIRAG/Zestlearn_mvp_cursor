@@ -3,7 +3,7 @@ const audiences = [
     title: "Innovation Managers",
     painPoint: "Overwhelmed by AI hype with no clear path to real ROI",
     description:
-      "You're tasked with driving innovation but lack the bandwidth to evaluate every AI tool. ZestLearn cuts through the noise and surfaces only the opportunities worth pursuing.",
+      "You're tasked with driving innovation but lack the bandwidth to evaluate every AI tool. Cellvara cuts through the noise and surfaces only the opportunities worth pursuing.",
     benefits: [
       "Prioritized AI use cases by impact",
       "Clear business case documentation",
@@ -24,7 +24,7 @@ const audiences = [
     title: "Digital Transformation Leads",
     painPoint: "Struggling to align AI initiatives with business strategy",
     description:
-      "Bridging the gap between technical possibilities and business needs is hard. ZestLearn maps AI opportunities directly to your strategic objectives and existing workflows.",
+      "Bridging the gap between technical possibilities and business needs is hard. Cellvara maps AI opportunities directly to your strategic objectives and existing workflows.",
     benefits: [
       "Strategy-aligned roadmaps",
       "Integration-first approach",
@@ -45,7 +45,7 @@ const audiences = [
     title: "Operations Managers",
     painPoint: "Manual processes draining team productivity",
     description:
-      "You see inefficiencies daily but can't justify the time to research AI solutions. ZestLearn identifies quick wins that free up your team for higher-value work.",
+      "You see inefficiencies daily but can't justify the time to research AI solutions. Cellvara identifies quick wins that free up your team for higher-value work.",
     benefits: [
       "Process automation opportunities",
       "Time-to-value estimates",
@@ -72,7 +72,7 @@ const audiences = [
     title: "R&D / Process Leads",
     painPoint: "Scientific expertise trapped in siloed, repetitive tasks",
     description:
-      "Your team's brilliance is wasted on data wrangling and documentation. ZestLearn finds AI solutions that amplify your scientists' impact, not replace them.",
+      "Your team's brilliance is wasted on data wrangling and documentation. Cellvara finds AI solutions that amplify your scientists' impact, not replace them.",
     benefits: [
       "Research workflow optimization",
       "Data pipeline automation",
@@ -107,7 +107,7 @@ export function TargetAudience() {
             Built for Pharma & Biotech Leaders
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-muted-foreground">
-            ZestLearn is designed for decision-makers at SMEs who need to move
+            Cellvara is designed for decision-makers at SMEs who need to move
             fast on AI without the luxury of a dedicated data science team.
           </p>
         </div>

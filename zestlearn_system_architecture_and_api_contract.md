@@ -1,8 +1,8 @@
-# ZestLearn System Architecture, Folder Structure, and API Contract
+# Cellvara System Architecture, Folder Structure, and API Contract
 
 ## 1. Document Purpose
 
-This document translates the ZestLearn MVP product and technical PRD into a direct implementation guide for development.
+This document translates the Cellvara MVP product and technical PRD into a direct implementation guide for development.
 
 It defines:
 
@@ -23,7 +23,7 @@ This document should be used as the primary engineering reference during the 24-
 
 Build a working web application where a user can:
 
-1. land on ZestLearn,
+1. land on Cellvara,
 2. complete an AI assessment,
 3. create a workspace,
 4. upload documents,
@@ -45,7 +45,7 @@ The implementation should prioritize:
 
 ## 3.1 High-Level Architecture
 
-The ZestLearn MVP consists of the following main layers:
+The Cellvara MVP consists of the following main layers:
 
 ### 1. Frontend Application
 
@@ -293,7 +293,7 @@ n8n should not own:
 Below is a recommended structure for a Next.js + Convex implementation.
 
 ```text
-zestlearn/
+cellvara/
 ├── app/
 │   ├── page.tsx
 │   ├── layout.tsx
@@ -1563,10 +1563,10 @@ The system is demo-ready when:
 
 ## 24. Final Engineering Summary
 
-The ZestLearn MVP should be built as a clean, context-driven web application with a strong separation between UI, persistence, AI orchestration, and reusable processing logic. The architecture must support a reliable end-to-end consulting workflow while remaining simple enough for a solo founder to implement within 24 hours.
+The Cellvara MVP should be built as a clean, context-driven web application with a strong separation between UI, persistence, AI orchestration, and reusable processing logic. The architecture must support a reliable end-to-end consulting workflow while remaining simple enough for a solo founder to implement within 24 hours.
 
 The system should be optimized not for maximal feature count, but for a convincing product loop:
 
 **context in → reasoning grounded in context → structured recommendation out → insight saved for reuse**
 
-That loop is the technical heart of the ZestLearn MVP.
+That loop is the technical heart of the Cellvara MVP.

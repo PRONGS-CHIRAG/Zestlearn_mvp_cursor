@@ -1,8 +1,8 @@
-# ZestLearn Cursor-Ready Implementation Plan
+# Cellvara Cursor-Ready Implementation Plan
 
 ## 1. Document Purpose
 
-This document translates the ZestLearn MVP into a direct implementation plan for building inside Cursor.
+This document translates the Cellvara MVP into a direct implementation plan for building inside Cursor.
 
 It is designed to answer:
 
@@ -19,7 +19,7 @@ This is not just a roadmap. It is an execution plan.
 
 ## 2. Build Goal
 
-Build a working ZestLearn MVP web app that allows a user to:
+Build a working Cellvara MVP web app that allows a user to:
 
 1. visit a landing page,
 2. submit an assessment,
@@ -790,7 +790,7 @@ Below are prompts you can paste directly into Cursor while building.
 ## Prompt 1 — Project Scaffold
 
 ```text
-Create a clean Next.js 14 + TypeScript + Tailwind project structure for an MVP called ZestLearn.
+Create a clean Next.js 14 + TypeScript + Tailwind project structure for an MVP called Cellvara.
 It is an AI consultant copilot for pharma and biotech SMEs.
 Set up route folders for landing page, assessment page, workspace page with dynamic workspaceId, report page, and API routes for upload, chat, report, and webhook.
 Also create reusable component folders, lib folders for AI, documents, reports, memory, validation, and Convex backend files.
@@ -802,7 +802,7 @@ Do not add unnecessary complexity. Keep it clean, modular, and MVP-friendly.
 ## Prompt 2 — Landing Page
 
 ```text
-Build a modern landing page for ZestLearn using React, Next.js, and Tailwind.
+Build a modern landing page for Cellvara using React, Next.js, and Tailwind.
 The product helps pharma and biotech SMEs discover the best AI pilot for their team.
 Include these sections: Hero, how it works, target audience, example outputs, CTA.
 Tone should feel modern, credible, and AI/startup oriented. CTA button text should be “Start Your AI Assessment”.
@@ -814,7 +814,7 @@ Keep styling clean and premium, with cards and subtle gradients.
 ## Prompt 3 — Assessment Form
 
 ```text
-Build a multi-section but single-page assessment form component for ZestLearn.
+Build a multi-section but single-page assessment form component for Cellvara.
 Fields: companyName, companyType, companySize, department, role, aiMaturity, bottleneck, desiredOutcome, currentTools, dataAvailability.
 Use React state and TypeScript. Add validation for required fields and good UX with labels, placeholders, and helper text.
 On submit, call a provided async submitAssessment function and redirect to /workspace/[workspaceId] on success.
@@ -826,7 +826,7 @@ Include loading and error states.
 ## Prompt 4 — Convex Schema and Mutations
 
 ```text
-Generate Convex schema and backend functions for a ZestLearn MVP.
+Generate Convex schema and backend functions for a Cellvara MVP.
 Create tables for workspaces, assessments, documents, chatMessages, reports, memoryPatterns, and events.
 Implement mutations and queries for creating a workspace, submitting an assessment, fetching workspace dashboard data, saving chat messages, saving reports, and fetching memory patterns.
 Use TypeScript and clean domain separation across files.
@@ -837,7 +837,7 @@ Use TypeScript and clean domain separation across files.
 ## Prompt 5 — Workspace Shell
 
 ```text
-Build a workspace dashboard UI for ZestLearn.
+Build a workspace dashboard UI for Cellvara.
 It should have tabs or a sidebar for Overview, Documents, Chat, Reports, and Insights.
 The layout should feel modern, SaaS-like, and responsive.
 The overview panel should show company profile and assessment summary.
@@ -861,7 +861,7 @@ Keep the implementation simple and robust for MVP use.
 ## Prompt 7 — Chat Backend
 
 ```text
-Implement a consultant chat API route for ZestLearn.
+Implement a consultant chat API route for Cellvara.
 Input: workspaceId and message.
 Fetch workspace profile, assessment data, recent chat history, document summaries, and memory patterns.
 Assemble compact prompt context and call a Gemini-based AI provider.
@@ -875,7 +875,7 @@ Use TypeScript and keep the logic modular.
 ## Prompt 8 — Chat UI
 
 ```text
-Build a chat interface for ZestLearn.
+Build a chat interface for Cellvara.
 Include a scrollable message list, message bubbles for user and assistant, a text input, submit button, loading state, and optional prompt starter buttons.
 The UI should feel modern and calm, suitable for a B2B AI copilot product.
 Use React and Tailwind. Keep components modular.
@@ -886,7 +886,7 @@ Use React and Tailwind. Keep components modular.
 ## Prompt 9 — Report Generator
 
 ```text
-Implement a structured report generation pipeline for ZestLearn.
+Implement a structured report generation pipeline for Cellvara.
 Input: workspaceId.
 Fetch workspace profile, assessment, documents, recent chat context, and memory patterns.
 Build a prompt that asks the model to return strict JSON with fields: problem_summary, current_pain_points, recommended_use_cases, best_first_pilot, roadmap_30_60_90, open_questions.
@@ -899,7 +899,7 @@ Use clear TypeScript types.
 ## Prompt 10 — Report UI
 
 ```text
-Build a report view for ZestLearn using React and Tailwind.
+Build a report view for Cellvara using React and Tailwind.
 Display sections for Problem Summary, Recommended Use Cases, Best First Pilot, Risks, 30/60/90 Roadmap, and Open Questions.
 Use card-based layout and make it feel polished and professional.
 Assume the input is a structured report object with nested arrays.
@@ -910,7 +910,7 @@ Assume the input is a structured report object with nested arrays.
 ## Prompt 11 — Memory Layer
 
 ```text
-Implement a simple collective memory layer for ZestLearn.
+Implement a simple collective memory layer for Cellvara.
 Create helper functions that extract short reusable patterns from a generated report, such as common blockers, recommended first pilots, and risk insights.
 Store them in a memoryPatterns collection and build a query to fetch relevant patterns for a workspace.
 Also create a small Insights panel UI that displays these patterns as cards.
@@ -1012,7 +1012,7 @@ Do not over-engineer abstractions too early.
 Do not build hidden complexity for features that are not yet visible.
 Do not optimize prematurely.
 
-The ZestLearn MVP only needs one convincing product loop:
+The Cellvara MVP only needs one convincing product loop:
 
 **user context in → AI reasoning grounded in context → structured recommendation out → reusable insight saved**
 

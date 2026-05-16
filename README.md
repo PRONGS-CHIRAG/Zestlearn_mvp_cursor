@@ -1,8 +1,8 @@
-# ZestLearn
+# Cellvara
 
 **AI Consultant Copilot for Pharma & Biotech SMEs**
 
-ZestLearn helps pharma and biotech teams move from "we think AI could help us" to "here is our best AI pilot, why it matters, what it needs, and what to do next."
+Cellvara helps pharma and biotech teams move from "we think AI could help us" to "here is our best AI pilot, why it matters, what it needs, and what to do next."
 
 ---
 

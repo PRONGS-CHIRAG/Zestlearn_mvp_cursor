@@ -1,4 +1,4 @@
-# ZestLearn Implementation Status
+# Cellvara Implementation Status
 
 ## Purpose
 
@@ -29,7 +29,7 @@ The full shared base scaffold has been created and `npm install` has been run su
 - Cursor prompt pack
 - hackathon checklist
 - fake demo company profiles (`fake_pharma_companies.md`)
-- demo dummy documents for HelixPharm, Rheonix, and NovaCura (`zestlearn_dummy_docs/`)
+- demo dummy documents for HelixPharm, Rheonix, and NovaCura (`cellvara_dummy_docs/`)
 - shared planning/memory files for Codex and Cursor
 - structured single-coder execution guide in `structuring_per_coder.md`
 
@@ -114,7 +114,7 @@ The full shared base scaffold has been created and `npm install` has been run su
 ## Latest Completed Work
 
 ### Just Completed
-- Created full shared base scaffold matching `zestlearn_system_architecture_and_api_contract.md`
+- Created full shared base scaffold matching `cellvara_system_architecture_and_api_contract.md`
 - Ran `npm install` — 393 packages installed, project compiles cleanly
 - `tsc --noEmit` passes with zero errors on all non-Convex files
 - Convex files excluded from Next.js tsc pass (compiled separately by Convex CLI)
